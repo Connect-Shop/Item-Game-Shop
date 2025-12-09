@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C SHOP CONNECT CENTER</title>
+    <!-- Google Fonts: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #F9FAFB;
+        }
+        .text-primary-red {
+            color: #E60023;
+        }
+        .bg-primary-red {
+            background-color: #E60023;
+        }
+        .bg-primary-red:hover {
+            background-color: #c5001f;
+        }
+        .sidebar-item.active {
+            background-color: #FEF2F2;
+            color: #E60023;
+            border-right: 3px solid #E60023;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ccc; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b3b3b3; 
+        }
+        .modal-animate-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Navbar -->
+    <nav class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center gap-2">
+                    <!-- Hamburger for Mobile -->
+                    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-md text-gray-500 hover:text-red-600 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center cursor-pointer">
+                        <span class="text-2xl font-bold italic tracking-tighter">C<span class="text-primary-red"> Shop</span></span>
+                        <span class="ml-2 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full hidden sm:block">PREMIUM APP</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <a href="#" class="text-primary-red font-medium flex items-center gap-1 hover:bg-red-50 px-3 py-1.5 rounded-lg transition">
+                        <i class="fas fa-home"></i> <span class="hidden sm:inline">หน้าแรก</span>
+                    </a>
+                    <a href="#" class="text-gray-600 font-medium flex items-center gap-1 hover:bg-gray-50 px-3 py-1.5 rounded-lg transition">
+                        <i class="fas fa-box-open"></i> <span class="hidden sm:inline">สินค้า</span>
+                    </a>
+                    <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-gray-200 cursor-pointer transition">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            
+            <!-- Sidebar (Desktop) -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="bg-white rounded-xl shadow-sm p-4 sticky top-24">
+                    <h2 class="text-lg font-bold mb-4 px-2">หมวดหมู่สินค้า</h2>
+                    <p class="text-xs text-gray-400 mb-4 px-2">เลือกดูสินค้าตามหมวดหมู่</p>
+                    
+                    <div class="space-y-1">
+                        <a href="#" onclick="filterGames('all')" class="sidebar-item active flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition cursor-pointer">
+                            <span><i class="fas fa-th-large mr-2"></i> ทั้งหมด</span>
+                            <span class="bg-red-100 text-red-600 text-xs px-2 py-0.5 rounded-full" id="count-all">0</span>
+                        </a>
+                        <a href="#" onclick="filterGames('mobile')" class="sidebar-item flex items-center justify-between px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition cursor-pointer">
+                            <span><i class="fas fa-mobile-alt mr-2"></i> เกมมือถือ</span>
+                        </a>
+                        <a href="#" onclick="filterGames('pc')" class="sidebar-item flex items-center justify-between px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50 transition cursor-pointer">
+                            <span><i class="fas fa-desktop mr-2"></i> เกม PC</span>
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Mobile Sidebar Overlay -->
+            <div id="mobile-sidebar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" onclick="toggleMobileSidebar()">
+                <div class="bg-white w-64 h-full p-4 transform transition-transform duration-300 -translate-x-full" id="mobile-sidebar-content" onclick="event.stopPropagation()">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold">หมวดหมู่</h2>
+                        <button onclick="toggleMobileSidebar()" class="text-gray-500"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="space-y-1">
+                        <a href="#" onclick="filterGames('all'); toggleMobileSidebar()" class="block px-4 py-3 rounded-lg bg-red-50 text-red-600 font-medium">ทั้งหมด</a>
+                        <a href="#" onclick="filterGames('mobile'); toggleMobileSidebar()" class="block px-4 py-3 rounded-lg text-gray-600">เกมมือถือ</a>
+                        <a href="#" onclick="filterGames('pc'); toggleMobileSidebar()" class="block px-4 py-3 rounded-lg text-gray-600">เกม PC</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Area -->
+            <main class="flex-1">
+                <!-- Search Bar -->
+                <div class="bg-white p-4 rounded-xl shadow-sm mb-6 flex flex-col sm:flex-row gap-3 items-center">
+                    <div class="relative flex-1 w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400"></i>
+                        </div>
+                        <input type="text" id="searchInput" onkeyup="searchGames()" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-red-200" placeholder="พิมพ์ชื่อสินค้า เช่น Free Fire, RoV">
+                    </div>
+                    <button onclick="document.getElementById('searchInput').value=''; searchGames()" class="bg-primary-red text-white px-6 py-2.5 rounded-lg font-medium text-sm hover:opacity-90 transition w-full sm:w-auto">
+                        ล้างคำค้น
+                    </button>
+                </div>
+
+                <!-- Banner/Title -->
+                <div class="mb-6">
+                    <h1 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-crown text-primary-red"></i> สินค้าแนะนำพร้อมส่วนลดพิเศษ
+                    </h1>
+                    <p class="text-gray-500 text-sm mt-1">เลือกเกมที่คุณต้องการเติมเพื่อดูเรทราคาและไอเทมสุดคุ้ม</p>
+                </div>
+
+                <!-- Game Grid -->
+                <div id="game-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+                    <!-- JS renders cards here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for Items -->
+    <div id="item-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
+
+            <!-- Modal panel -->
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full modal-animate-in">
+                
+                <!-- Modal Header -->
+                <div class="bg-white px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+                    <div class="flex items-center gap-3">
+                        <img id="modal-game-img" src="" alt="Game Logo" class="w-10 h-10 rounded-lg object-cover shadow-sm">
+                        <div>
+                            <h3 class="text-lg leading-6 font-bold text-gray-900" id="modal-game-title">Game Name</h3>
+                            <p class="text-xs text-gray-500">เลือกจำนวนที่ต้องการเติม</p>
+                        </div>
+                    </div>
+                    <button type="button" class="text-gray-400 hover:text-gray-500 focus:outline-none" onclick="closeModal()">
+                        <span class="sr-only">Close</span>
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Content (Grid of Items) -->
+                <div class="bg-gray-50 px-4 py-6 sm:px-6">
+                    <div id="modal-items-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <!-- JS renders items here -->
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-white px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-gray-100">
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModal()">
+                        ปิดหน้าต่าง
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 transition-transform duration-300 z-50 flex items-center gap-3">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span>ทำรายการสำเร็จ! (จำลอง)</span>
+    </div>
+
+    <script>
+        // --- Data ---
+        const games = [
+            { name: "Free Fire (โปรโมชั่น)", img: "https://www.termtang.com/assets/images/termgame/free-fire-p.png?v=1", discount: "-20%", type: "freefire" },
+            { name: "RoV Mobile MOBA", img: "https://www.termtang.com/assets/images/termgame/aov-2.png?v=3", discount: "-3%", type: "rov" },
+            { name: "Call of Duty: Mobile", img: "https://www.termtang.com/assets/images/termgame/call-of-duty-m.png", discount: "-3%" },
+            { name: "Delta Force Garena", img: "https://www.termtang.com/assets/images/termgame/delta-force-garena.png", discount: "-12%" },
+            { name: "PUBG Mobile (TH)", img: "https://www.termtang.com/assets/images/termgame/pubg-2.png?v=7", discount: "-15%" },
+            { name: "PUBG Mobile (Global)", img: "https://www.termtang.com/assets/images/termgame/pubg-mobile-global.png", discount: "-17%" },
+            { name: "Arena Breakout", img: "https://www.termtang.com/assets/images/termgame/arena-breakout.png?v=1", discount: "-5%" },
+            { name: "Teamfight Tactics", img: "https://www.termtang.com/assets/images/termgame/teamfight-tactics-mobile.png", discount: "-21%" },
+            { name: "Racing Master", img: "https://www.termtang.com/assets/images/termgame/racing-master.png", discount: "-5%" },
+            { name: "LoL: Wild Rift", img: "https://www.termtang.com/assets/images/termgame/lol-2.png?v=1", discount: "-5%" },
+            { name: "Valorant", img: "https://www.termtang.com/assets/images/termgame/valorant-cam.png?v=7", discount: "-22%", type: "pc" },
+            { name: "Genshin Impact", img: "https://www.termtang.com/assets/images/termgame/genshin_tile.png?v=4", discount: "-5%" },
+            { name: "League of Legends (PC)", img: "https://www.termtang.com/assets/images/termgame/league-of-legends-riot.png?v=5", discount: "-12%", type: "pc" },
+            { name: "Ragnarok Origin", img: "https://www.termtang.com/assets/images/termgame/rag-origin.png", discount: "-6%" },
+            { name: "FC Mobile", img: "https://www.termtang.com/assets/images/termgame/fc-mobile.png?v=1", discount: "-3%" },
+            { name: "Garena Undawn", img: "https://www.termtang.com/assets/images/termgame/garena-undawn.png?v=1", discount: "-19%" },
+            { name: "Honkai: Star Rail", img: "https://www.termtang.com/assets/images/termgame/honkai-star-rail.png", discount: "-6%" },
+            { name: "MapleStory R: Evolution", img: "https://www.termtang.com/assets/images/termgame/maplestory-r-evolution.png?v=1", discount: "-5%" },
+            { name: "Metal Slug: Awakening", img: "https://www.termtang.com/assets/images/termgame/metal-slug-awakening.png?v=1", discount: "-3%" },
+            { name: "Black Clover M", img: "https://www.termtang.com/assets/images/termgame/black-clover-m.png", discount: "-5%" },
+            { name: "Mobile Legends (GL)", img: "https://www.termtang.com/assets/images/termgame/mob-2-global.png?v=1", discount: "-12%" },
+            { name: "Ragnarok M", img: "https://www.termtang.com/assets/images/termgame/rag-2.png?v=2", discount: "-20%" },
+            { name: "One Punch Man", img: "https://www.termtang.com/assets/images/termgame/one-2.png", discount: "-12%" },
+            { name: "Identity V", img: "https://www.termtang.com/assets/images/termgame/identity.png?v=2", discount: "-14%" },
+            { name: "Ragnarok X", img: "https://www.termtang.com/assets/images/termgame/rag-origin.png", discount: "-13%" }, // Placeholder img used
+            { name: "Zepeto", img: "https://www.termtang.com/assets/images/termgame/c3zs9CW.png", discount: "-19%" },
+            { name: "Ace Racer", img: "https://www.termtang.com/assets/images/termgame/ace_racer.png", discount: "-10%" },
+            { name: "Seal Mobile", img: "https://www.termtang.com/assets/images/termgame/seal-mobile.png", discount: "-20%" },
+            { name: "Harry Potter: MA", img: "https://www.termtang.com/assets/images/termgame/harry-potter-magic-awakened.png", discount: "-20%" },
+            { name: "Dead by Daylight M", img: "https://www.termtang.com/assets/images/termgame/dead-by-daylight-mobile.png", discount: "-17%" },
+            { name: "Onmyoji Arena", img: "https://www.termtang.com/assets/images/termgame/onmyoji-arena.png", discount: "-10%" },
+            { name: "Roblox", img: "https://www.termtang.com/assets/images/termgame/roblox.png", discount: "-24%" },
+            { name: "Blood Strike", img: "https://www.termtang.com/assets/images/termgame/blood-strike.png", discount: "-20%" },
+            { name: "Eggy Party", img: "https://www.termtang.com/assets/images/termgame/eggy-party.png", discount: "-3%" },
+            { name: "Dummyland", img: "https://www.termtang.com/assets/images/termgame/DummyLand_icon.png?v=1", discount: "-21%" },
+            { name: "Honor of Kings", img: "https://www.termtang.com/assets/images/termgame/honor-of-kings.png", discount: "-1%" },
+            { name: "Cabal Infinite Combo", img: "https://www.termtang.com/assets/images/termgame/cabal-infinite-combo.png", discount: "-34%" },
+            { name: "Tarisland", img: "https://www.termtang.com/assets/images/termgame/tarisland.png", discount: "-17%", type: "pc" },
+            { name: "Zenless Zone Zero", img: "https://www.termtang.com/assets/images/termgame/zenless-zone-zero.png", discount: "-18%" },
+            { name: "Dragon Raja", img: "https://www.termtang.com/assets/images/termgame/dra-2.png?v=1", discount: "-10%" },
+            { name: "MU Origin 3", img: "https://www.termtang.com/assets/images/termgame/mu-origin3.png", discount: "-17%" },
+            { name: "Sausage Man", img: "https://www.termtang.com/assets/images/termgame/sausage-man.png", discount: "-16%" },
+            { name: "NIKKE", img: "https://www.termtang.com/assets/images/termgame/goddess-of-victory-nikke.png", discount: "-16%" },
+            { name: "X-Hero", img: "https://www.termtang.com/assets/images/termgame/x-hero.png", discount: "-20%" },
+            { name: "Marvel Super War", img: "https://www.termtang.com/assets/images/termgame/mar-2.png", discount: "-16%" },
+            { name: "Marvel Snap", img: "https://www.termtang.com/assets/images/termgame/marvel-snap.png", discount: "-14%" },
+            { name: "Diablo Immortal", img: "https://www.termtang.com/assets/images/termgame/diablo-immortal.png?v=1", discount: "-7%" },
+            { name: "Super Sus", img: "https://www.termtang.com/assets/images/termgame/super-sus.png", discount: "-5%" },
+            { name: "Legends of Runeterra", img: "https://www.termtang.com/assets/images/termgame/legends-of-runeterra.png", discount: "-20%", type: "pc" },
+            { name: "Naruto: Slugfest", img: "https://www.termtang.com/assets/images/termgame/nau-2.png", discount: "-10%" },
+            { name: "MU Archangel", img: "https://www.termtang.com/assets/images/termgame/muaa.png", discount: "-10%" },
+        ];
+
+        const freeFireItems = [
+            { name: "33 Diamond", price: "10฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "68 Diamond", price: "20฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "172 Diamond", price: "49฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "310 Diamond", price: "88฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "517 Diamond", price: "146฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "690 Diamond", price: "194฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "1,052 Diamond", price: "291฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "1,801 Diamond", price: "485฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "3,698 Diamond", price: "970฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "แพ็คสุดคุ้ม-รายสัปดาห์", price: "65฿", detail: "รับเพชรรวม 450 (รับทันที 100 + 50/วัน)", img: "https://cdn-icons-png.flaticon.com/512/10534/10534160.png" },
+            { name: "แพ็ครายเดือน", price: "292฿", detail: "รับ 2,600 เพชร (รับทันที 500 + 70/วัน)", img: "https://cdn-icons-png.flaticon.com/512/2650/2650462.png" },
+            { name: "Booyah Pass", price: "88฿", detail: "รับ FF Token 10 ชิ้นเป็นการชดเชย", img: "https://cdn-icons-png.flaticon.com/512/9634/9634027.png" },
+            { name: "รายสัปดาห์แบบมินิ", price: "33฿", img: "https://cdn-icons-png.flaticon.com/512/8146/8146782.png" },
+            { name: "Level Up Pass (Lv 6)", price: "8฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+            { name: "Level Up Pass (Lv 10)", price: "18฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+            { name: "Level Up Pass (Lv 15)", price: "18฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+            { name: "Level Up Pass (Lv 20)", price: "18฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+            { name: "Level Up Pass (Lv 25)", price: "18฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+            { name: "Level Up Pass (Lv 30)", price: "25฿", detail: "1 ครั้งต่อ ID", img: "https://cdn-icons-png.flaticon.com/512/2850/2850689.png" },
+        ];
+
+        const rovItems = [
+            { name: "11 คูปอง", price: "10฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "24 คูปอง", price: "20฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "60 คูปอง", price: "49฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "110 คูปอง", price: "88฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "185 คูปอง", price: "146฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "370 คูปอง", price: "291฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "620 คูปอง", price: "485฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+            { name: "1,240 คูปอง", price: "970฿", img: "https://cdn-icons-png.flaticon.com/512/272/272525.png" },
+        ];
+
+        // --- Functions ---
+
+        function init() {
+            renderGames(games);
+            document.getElementById('count-all').innerText = games.length;
+        }
+
+        function renderGames(data) {
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            data.forEach((game, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-sm hover:shadow-lg transition-shadow duration-300 p-5 flex flex-col justify-between border border-transparent hover:border-red-100 group relative";
+                
+                // Image handling with fallback
+                const imgUrl = game.img || 'https://via.placeholder.com/80?text=Game';
+                
+                card.innerHTML = `
+                    <div class="absolute top-3 right-3 bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-md">
+                        ${game.discount}
+                    </div>
+                    <div class="flex items-start gap-4 mb-4">
+                        <img src="${imgUrl}" alt="${game.name}" class="w-16 h-16 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/80?text=No+Img'">
+                        <div class="flex-1 min-w-0 pt-1">
+                            <h3 class="text-base font-bold text-gray-800 truncate leading-tight mb-1" title="${game.name}">${game.name}</h3>
+                            <div class="flex items-center gap-1 text-xs text-gray-500">
+                                <i class="fas fa-bolt text-yellow-400"></i>
+                                <span>บริการอัตโนมัติ 24ชม.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="openGameModal(${index})" class="w-full bg-primary-red text-white py-2.5 rounded-lg font-medium text-sm hover:opacity-90 transition shadow-red-200 shadow-md flex justify-center items-center gap-2">
+                        <i class="fas fa-shopping-cart text-xs"></i> ไอเทม
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function searchGames() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = games.filter(g => g.name.toLowerCase().includes(query));
+            renderGames(filtered);
+        }
+
+        function filterGames(category) {
+            document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            if (category === 'all') {
+                renderGames(games);
+            } else if (category === 'mobile') {
+                // Assuming non-PC typed games are mobile for demo
+                const filtered = games.filter(g => g.type !== 'pc');
+                renderGames(filtered);
+            } else if (category === 'pc') {
+                const filtered = games.filter(g => g.type === 'pc');
+                renderGames(filtered);
+            }
+        }
+
+        function openGameModal(index) {
+            const game = games[index];
+            document.getElementById('modal-game-title').innerText = game.name;
+            document.getElementById('modal-game-img').src = game.img;
+            
+            const modalGrid = document.getElementById('modal-items-grid');
+            modalGrid.innerHTML = '';
+
+            let itemsToShow = [];
+
+            if (game.type === 'freefire') {
+                itemsToShow = freeFireItems;
+            } else if (game.type === 'rov') {
+                itemsToShow = rovItems;
+            } else {
+                // Generic placeholder items for other games
+                for(let i=1; i<=6; i++) {
+                    itemsToShow.push({
+                        name: `${i * 100} Coins`,
+                        price: `${i * 30}฿`,
+                        img: "https://cdn-icons-png.flaticon.com/512/806/806253.png"
+                    });
+                }
+            }
+
+            itemsToShow.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = "bg-white border border-gray-200 rounded-xl p-3 flex flex-col items-center justify-center hover:border-red-500 cursor-pointer transition relative group";
+                itemEl.onclick = () => selectItem(item.name, item.price);
+                
+                itemEl.innerHTML = `
+                    <div class="w-12 h-12 mb-2 flex items-center justify-center">
+                        <img src="${item.img}" class="max-w-full max-h-full object-contain drop-shadow-sm">
+                    </div>
+                    <div class="text-center w-full">
+                        <div class="text-xs font-medium text-gray-700 mb-1 line-clamp-1 group-hover:text-red-600 transition">${item.name}</div>
+                        <div class="text-sm font-bold text-red-600">${item.price}</div>
+                        ${item.detail ? `<div class="text-[10px] text-gray-400 mt-1 line-clamp-2 leading-tight">${item.detail}</div>` : ''}
+                    </div>
+                `;
+                modalGrid.appendChild(itemEl);
+            });
+
+            document.getElementById('item-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        function closeModal() {
+            document.getElementById('item-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function selectItem(name, price) {
+            closeModal();
+            // Show toast
+            const toast = document.getElementById('toast');
+            toast.innerHTML = `<i class="fas fa-check-circle text-green-400"></i> <div>เลือก <b>${name}</b> (${price}) <br><span class="text-xs text-gray-300">เข้าสู่ขั้นตอนชำระเงิน...</span></div>`;
+            toast.classList.remove('translate-y-20');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20');
+            }, 3000);
+        }
+
+        function toggleMobileSidebar() {
+            const sidebar = document.getElementById('mobile-sidebar');
+            const content = document.getElementById('mobile-sidebar-content');
+            
+            if (sidebar.classList.contains('hidden')) {
+                sidebar.classList.remove('hidden');
+                setTimeout(() => content.classList.remove('-translate-x-full'), 10);
+            } else {
+                content.classList.add('-translate-x-full');
+                setTimeout(() => sidebar.classList.add('hidden'), 300);
+            }
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileSidebar);
+
+        // Run Init
+        init();
+
+    </script>
+</body>
+</html>

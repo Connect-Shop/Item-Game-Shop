@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C SHOP CONNECT CENTER</title>
+    <title>C SHOP CONNECT</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- QR Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <style>
         :root {
             /* Spicy & Hot Palette */
@@ -234,7 +242,7 @@
         /* Banner (1300x300) */
         .banner-container {
             width: 100%;
-            height: 300px; /* ปรับความสูงตามที่ขอ */
+            height: 300px;
             border-radius: var(--radius-xl);
             overflow: hidden;
             position: relative;
@@ -401,18 +409,16 @@
             margin-bottom: 10px; 
         }
 
-        /* Update: Card Icon holds Image */
         .card-icon {
             width: 60px;
             height: 60px;
             border-radius: 14px;
-            /* background: #fff0f3; */ /* Remove BG */
             display: flex;
             justify-content: center;
             align-items: center;
             transition: all 0.3s;
             flex-shrink: 0;
-            overflow: hidden; /* Ensure image crop */
+            overflow: hidden;
             background-color: white;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
@@ -558,7 +564,6 @@
             align-items: center;
         }
 
-        /* Modal Icon Image */
         .modal-icon {
             width: 80px;
             height: 80px;
@@ -658,11 +663,11 @@
             border-top: 1px solid #eee;
         }
 
-        /* --- New Discount Code Design --- */
+        /* Cart Items Styles */
         .cart-promo {
             position: relative;
             background: white;
-            border-radius: 50px; /* Capsule shape */
+            border-radius: 50px;
             padding: 5px;
             display: flex;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
@@ -727,7 +732,7 @@
         }
 
         .summary-details.open {
-            max-height: 100px; /* Adjust based on content */
+            max-height: 100px;
         }
 
         .summary-row {
@@ -768,6 +773,276 @@
             object-fit: cover;
             flex-shrink: 0;
             border: 1px solid #eee;
+        }
+
+        /* --- Payment & Loading Overlays (NEW) --- */
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+
+        .spinner-main {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #fed7aa;
+            border-top: 4px solid #ff4757;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            animation: bounce 1s infinite;
+        }
+
+        /* Payment QR Modal - Custom Scoped Styles to match your Tailwind design without loading Tailwind full lib */
+        .pm-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 3001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .pm-overlay.active { display: flex; animation: fadeIn 0.3s ease-out; }
+
+        .pm-card {
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 340px;
+            padding: 1.5rem; 
+            text-align: center;
+            border: 1px solid #f3f4f6;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pm-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #888;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+        }
+        .pm-close-btn:hover { background: #ff4757; color: white; }
+
+        .pm-top-logo-box {
+            border: 1px solid #1e3a8a;
+            padding: 6px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: white;
+            white-space: nowrap;
+            min-height: 32px;
+            box-sizing: border-box;
+        }
+        
+        .pm-top-logo-text {
+            color: #1e3a8a;
+            font-weight: 700;
+            font-family: 'Prompt', sans-serif;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            display: block;
+        }
+
+        .pm-qr-container {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 15px auto;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pm-qr-overlay-logo {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px; height: 30px;
+            background: white;
+            padding: 2px;
+            border-radius: 5px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.15);
+            z-index: 5;
+            object-fit: cover;
+        }
+
+        /* NEW TIMER & STATUS STYLES */
+        .pm-timer-large {
+            font-family: 'Prompt', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #f97316; /* Orange color */
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .pm-status-text {
+            color: #9ca3af;
+            font-size: 13px;
+            font-weight: 400;
+            font-family: 'Prompt', sans-serif;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .pm-divider {
+            border-top: 1px solid #f3f4f6;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .pm-detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+            font-family: 'Prompt', sans-serif;
+        }
+        
+        .pm-label { color: #9ca3af; font-size: 13px; }
+        .pm-value { color: #1e3a8a; font-weight: 500; font-size: 13px; }
+
+        .pm-amount-box {
+            background-color: #eef5ff;
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid #eff6ff;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .pm-amount-input {
+            background: transparent;
+            text-align: right;
+            width: 120px;
+            outline: none;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 16px;
+            border: none;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        /* NEW UPLOAD & CONFIRM STYLES */
+        .slip-upload-wrapper {
+            position: relative;
+            background: white;
+            border-radius: 50px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .slip-file-text {
+            flex: 1;
+            padding: 0 15px;
+            font-size: 13px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
+        .slip-upload-btn {
+            background: #1e3a8a; /* Dark Blue */
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .slip-upload-btn:hover {
+            transform: scale(1.05);
+            background: #172554;
+        }
+
+        .btn-confirm-payment {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 15, 57, 0.3);
+        }
+
+        .btn-confirm-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 15, 57, 0.5);
+        }
+
+        /* Spinner for loading inside QR */
+        .spinner {
+            width: 35px; height: 35px;
+            border: 3px solid #fed7aa;
+            border-top: 3px solid #f97316;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Responsive */
@@ -977,11 +1252,95 @@
                 <span>ยอดรวมชำระ</span>
                 <span class="total-price-text" id="cart-total">0.00 ฿</span>
             </div>
-            <button class="buy-btn" style="font-size: 16px; padding: 15px;">
+            <button class="buy-btn" id="checkout-btn" style="font-size: 16px; padding: 15px;" onclick="initiatePayment()">
                 ชำระเงิน <i class="fas fa-arrow-right"></i>
             </button>
         </div>
     </div>
+
+    <!-- Loading Animation Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner-main"></div>
+        <div class="loading-text">กำลังสร้างรายการ...</div>
+    </div>
+
+    <!-- Payment QR Modal (Updated Layout) -->
+    <div class="pm-overlay" id="payment-modal">
+        <div class="pm-card" id="capture-area">
+            <button class="pm-close-btn" onclick="closePaymentModal()">&times;</button>
+            
+            <!-- Top Logo -->
+            <div class="pm-top-logo-box">
+                <span class="pm-top-logo-text">Thai QR <span style="color:#0ea5e9">Payment</span></span>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="pm-qr-container">
+                <div id="qr-code"></div>
+                <!-- Logo Overlay -->
+                <img src="https://profile.line-scdn.net/0hsOEB2wbnLGB4OzMyhDNTN0R-Ig0PFSooAFUzDlgzIFcGXG1iQg1iAFxrIFZWCGIzE15hDg49JgJS/preview" class="pm-qr-overlay-logo" crossorigin="anonymous">
+            </div>
+
+            <!-- Countdown Timer (Moved Up) -->
+            <div class="pm-timer-large" id="countdown-timer">03:00</div>
+
+            <!-- Status Text -->
+            <div class="pm-status-text">
+                QR ของคุณถูกสร้างเรียบร้อยแล้ว<br>
+                กรุณาชำระค่าสินค้าภายในเวลาที่กำหนด
+            </div>
+
+            <div class="pm-divider"></div>
+
+            <!-- Account Details -->
+            <div class="pm-detail-row">
+                <span class="pm-label">ชื่อบัญชี</span>
+                <span class="pm-value" id="account-name">MR. NARINPAT MEECHAI</span>
+            </div>
+            <div class="pm-detail-row">
+                <span class="pm-label">เลขพร้อมเพย์</span>
+                <span class="pm-value" id="promptpay-id">...</span>
+            </div>
+
+            <!-- Amount Box (LOCKED) -->
+            <div class="pm-amount-box">
+                <span style="color: #6b7280; font-size: 13px; font-weight: 500;">จำนวนเงิน</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="text" id="pm-amount-input" class="pm-amount-input" value="0.00" readonly>
+                    <span style="color: #1e3a8a; font-size: 12px; font-weight: 700;">THB</span>
+                </div>
+            </div>
+
+            <!-- Upload Slip Section (New Design) -->
+            <div class="slip-upload-wrapper">
+                <span class="slip-file-text" id="slip-filename">ยังไม่ได้เลือกไฟล์...</span>
+                <label for="slip-input" class="slip-upload-btn">
+                    <i class="fas fa-paperclip"></i> แนบสลีป
+                </label>
+                <input type="file" id="slip-input" hidden accept="image/*" onchange="handleFileUpload(this)">
+            </div>
+
+            <!-- Confirm Button -->
+            <button class="btn-confirm-payment" onclick="confirmPayment()">
+                ยืนยันชำระเงิน
+            </button>
+        </div>
+    </div>
+
+    <!-- JS Logic -->
+    <script type="module">
+        import promptpayQr from 'https://fastly.jsdelivr.net/npm/promptpay-qr@0.5.0/+esm';
+
+        // --- Config ---
+        const CONFIG = {
+            id: "140000621803299", 
+            accountName: "MR. NARINPAT MEECHAI"
+        };
+
+        // --- Expose functions to global scope for standard onClick events ---
+        window.CONFIG_QR = CONFIG;
+        window.promptpayQr = promptpayQr;
+    </script>
 
     <script>
         // --- Data ---
@@ -993,7 +1352,6 @@
             { id: 'premium', name: 'Premium ID', count: 7 }
         ];
 
-        // Replace Icons with Image URLs
         const products = [
             { id: 1, name: "Bilibili Premium", type: "entertainment", price: 97, old: 196, stock: 5, icon: "https://placehold.co/100x100/23ade5/ffffff?text=Bili", desc: ["พากย์ไทย/ซับไทย", "Full HD 1080p", "ไม่มีโฆษณา"], tag: "ขายดี" },
             { id: 2, name: "Netflix 4K UHD", type: "entertainment", price: 149, old: 180, stock: 12, icon: "https://placehold.co/100x100/e50914/ffffff?text=N", desc: ["จอส่วนตัว", "รหัสล็อคจอ", "ดูได้บนทีวี"], tag: "มาแรง" },
@@ -1008,8 +1366,147 @@
         // --- State ---
         let currentCategory = 'all';
         let cart = [];
+        let currentTotal = 0; // เก็บยอดรวมปัจจุบัน
 
-        // --- Render ---
+        // --- Payment Logic (NEW) ---
+        let qrcodeObj = null;
+        let timerInterval;
+
+        function formatMaskedID(str) {
+            let cleaned = ('' + str).replace(/\D/g, '');
+            if (cleaned.length === 15) {
+                let p1 = cleaned.substring(0, 3);
+                let pEnd = cleaned.substring(12, 15);
+                let suffix = pEnd.substring(0, 2) + '-' + pEnd.substring(2);
+                return `${p1}-X-XXX${suffix}`;
+            }
+            if (cleaned.length === 10) {
+                let p1 = cleaned.substring(0, 3);
+                let p3 = cleaned.substring(7, 10);
+                return `${p1}-XXX-X${p3}`;
+            }
+            return str;
+        }
+
+        // Initialize QR Object
+        function initQR() {
+            if(!qrcodeObj) {
+                qrcodeObj = new QRCode(document.getElementById("qr-code"), {
+                    width: 140,
+                    height: 140,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+                
+                // Set Account info in Modal
+                document.getElementById('account-name').innerText = window.CONFIG_QR.accountName;
+                document.getElementById('promptpay-id').innerText = formatMaskedID(window.CONFIG_QR.id);
+            }
+        }
+
+        function initiatePayment() {
+            if(cart.length === 0) {
+                alert('กรุณาเลือกสินค้าก่อนชำระเงิน');
+                return;
+            }
+
+            // 1. Show Loading
+            document.getElementById('loading-overlay').classList.add('active');
+            
+            // 2. Wait 1.5 Seconds
+            setTimeout(() => {
+                document.getElementById('loading-overlay').classList.remove('active');
+                
+                // 3. Show QR Modal
+                openPaymentModal();
+            }, 1500);
+        }
+
+        function openPaymentModal() {
+            document.getElementById('payment-modal').classList.add('active');
+            initQR();
+            
+            // Set Amount from Cart (Locked)
+            document.getElementById('pm-amount-input').value = currentTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Reset File Input
+            document.getElementById('slip-input').value = '';
+            document.getElementById('slip-filename').innerText = 'ยังไม่ได้เลือกไฟล์...';
+            document.getElementById('slip-filename').style.color = '#888';
+
+            // Generate QR
+            generateQR(currentTotal);
+            
+            // Start Timer
+            startTimer(180); // 3 minutes
+        }
+
+        function closePaymentModal() {
+            document.getElementById('payment-modal').classList.remove('active');
+            clearInterval(timerInterval);
+        }
+
+        function generateQR(amount) {
+            try {
+                if(window.promptpayQr) {
+                    const payload = window.promptpayQr(window.CONFIG_QR.id, { amount: parseFloat(amount) || 0 });
+                    qrcodeObj.clear();
+                    qrcodeObj.makeCode(payload);
+                }
+            } catch (e) {
+                console.error("QR Error", e);
+            }
+        }
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('countdown-timer');
+            
+            clearInterval(timerInterval);
+            timerInterval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "หมดเวลา";
+                    display.style.color = 'red';
+                } else {
+                    display.style.color = '#f97316';
+                }
+            }, 1000);
+        }
+
+        function handleFileUpload(input) {
+            if(input.files && input.files[0]) {
+                const filename = input.files[0].name;
+                document.getElementById('slip-filename').innerText = filename;
+                document.getElementById('slip-filename').style.color = '#1e3a8a';
+            }
+        }
+
+        function confirmPayment() {
+            const fileInput = document.getElementById('slip-input');
+            if(fileInput.files.length === 0) {
+                alert('กรุณาแนบสลีปการโอนเงินก่อนยืนยัน');
+                return;
+            }
+            alert('ยืนยันการชำระเงินสำเร็จ! (Demo)');
+            closePaymentModal();
+            cart = [];
+            updateCart();
+            document.getElementById('cart-sidebar').classList.remove('open');
+            document.getElementById('cart-overlay').classList.remove('open');
+        }
+
+        // --- Existing Shopping Cart Logic ---
+
         const renderCategories = () => {
             const list = document.getElementById('category-list');
             list.innerHTML = categories.map((c, i) => `
@@ -1023,7 +1520,6 @@
         const renderProducts = (filter = '') => {
             const grid = document.getElementById('product-grid');
             
-            // Filter Logic: Check Category AND Search Text
             const filtered = products.filter(p => {
                 const matchCat = currentCategory === 'all' || p.type === currentCategory;
                 const matchName = p.name.toLowerCase().includes(filter.toLowerCase());
@@ -1061,11 +1557,10 @@
             `).join('');
         }
 
-        // --- Interactions ---
         function selectCat(el, id) {
             currentCategory = id;
-            renderCategories(); // Re-render sidebar to update active state
-            renderProducts(document.getElementById('search-input').value); // Re-render products
+            renderCategories(); 
+            renderProducts(document.getElementById('search-input').value); 
         }
 
         document.getElementById('search-input').addEventListener('input', (e) => {
@@ -1090,7 +1585,7 @@
             goToSlide(currentSlide);
         }, 5000);
 
-        // --- Modal Logic ---
+        // --- Product Modal Logic ---
         const modalOverlay = document.getElementById('product-modal-overlay');
         
         function openProductModal(id) {
@@ -1101,12 +1596,10 @@
             document.getElementById('modal-price').innerText = p.price + ' พอยท์';
             document.getElementById('modal-desc').innerHTML = p.desc.map(d => `<div class="feature-item" style="font-size:14px; margin-bottom:8px;"><i class="fas fa-check-circle" style="color:#00b894; margin-right:8px;"></i> ${d}</div>`).join('');
             
-            // Set OnClick for Add Button
             const btn = document.getElementById('modal-add-btn');
             btn.onclick = () => {
                 addToCart(p.id);
                 closeProductModal();
-                // Removed toggleCart() call here to prevent auto-opening
             };
 
             modalOverlay.classList.add('open');
@@ -1121,13 +1614,11 @@
         });
 
         // --- Cart Logic ---
-
         function addToCart(id) {
             const p = products.find(x => x.id === id);
             cart.push({...p, cartId: Date.now()}); 
             updateCart();
             
-            // Animate Cart Icon (Shake Effect)
             const btn = document.getElementById('cart-btn');
             btn.classList.add('shake');
             setTimeout(() => btn.classList.remove('shake'), 500);
@@ -1139,24 +1630,21 @@
         }
 
         function updateCart() {
-            // Calculate Basic Total
             const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
             
-            // Calculate Fees
             const vat = subtotal * 0.07;
             const fee = (subtotal + vat) * 0.0299;
             const finalTotal = subtotal + vat + fee;
+            
+            currentTotal = finalTotal; // Update global total for payment
 
-            // Update UI Numbers
             document.getElementById('cart-badge').innerText = cart.length;
             
-            // Detailed Summary
             document.getElementById('summary-subtotal').innerText = subtotal.toFixed(2) + ' ฿';
             document.getElementById('summary-vat').innerText = vat.toFixed(2) + ' ฿';
             document.getElementById('summary-fee').innerText = fee.toFixed(2) + ' ฿';
             document.getElementById('cart-total').innerText = finalTotal.toFixed(2) + ' ฿';
             
-            // Render Items
             const cartList = document.getElementById('cart-items');
             if(cart.length === 0) {
                 cartList.innerHTML = `
@@ -1183,7 +1671,6 @@
             document.getElementById('cart-overlay').classList.toggle('open');
         }
 
-        // Toggle Details
         function toggleDetails() {
             const details = document.getElementById('summary-details');
             const toggle = document.querySelector('.summary-details-toggle');

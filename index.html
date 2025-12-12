@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>C SHOP CONNECT</title>
     
     <!-- Fonts -->
@@ -31,6 +31,7 @@
             --shadow-hover: 0 20px 50px rgba(255, 15, 57, 0.15);
             --glass-bg: rgba(255, 255, 255, 0.85);
             --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --nav-glass: rgba(255, 255, 255, 0.85);
         }
 
         * {
@@ -46,6 +47,7 @@
             color: var(--text-main);
             background-image: radial-gradient(#ff0f3908 1px, transparent 1px);
             background-size: 20px 20px;
+            padding-bottom: 100px; /* Space for bottom nav */
         }
 
         /* --- Animations --- */
@@ -65,7 +67,7 @@
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            padding: 15px 40px;
+            padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -74,6 +76,46 @@
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             border-bottom: var(--glass-border);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Hamburger Menu with Animation */
+        .menu-toggle {
+            font-size: 22px;
+            color: var(--text-main);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .menu-toggle i {
+            transition: transform 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255, 15, 57, 0.1);
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        .menu-toggle:hover i {
+            transform: rotate(90deg);
+        }
+
+        .menu-toggle:active {
+            transform: scale(0.9);
         }
 
         .logo {
@@ -85,20 +127,20 @@
         }
 
         .logo-icon {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             background: var(--primary-gradient);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             box-shadow: 0 8px 20px rgba(255, 15, 57, 0.3);
         }
 
         .logo h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             letter-spacing: -0.5px;
             background: -webkit-linear-gradient(45deg, #2d3436, #ff0f39);
@@ -108,13 +150,13 @@
 
         .header-actions {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
         }
 
         .icon-btn {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             border: none;
             background: white;
@@ -125,7 +167,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             position: relative;
         }
 
@@ -148,9 +190,9 @@
             right: -2px;
             background: #2d3436;
             color: white;
-            font-size: 10px;
-            width: 18px;
-            height: 18px;
+            font-size: 9px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -161,10 +203,11 @@
         /* --- Layout --- */
         .container {
             max-width: 1300px;
-            margin: 30px auto;
+            margin: 20px auto;
             display: flex;
             gap: 35px;
             padding: 0 20px;
+            transition: all 0.3s ease;
         }
 
         /* --- Sidebar --- */
@@ -174,6 +217,57 @@
             position: sticky;
             top: 100px;
             height: fit-content;
+            transition: all 0.3s ease;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Class to hide sidebar completely on Account page */
+        .sidebar.hidden-layout {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin: 0;
+            transform: translateX(-20px);
+        }
+
+        /* Mobile Sidebar Drawer */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 260px;
+                height: 100vh;
+                background: white;
+                z-index: 1002;
+                padding: 20px;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.1);
+                overflow-y: auto;
+                opacity: 1; /* Reset for mobile drawer */
+                transform: translateX(0); /* Reset logic handled by active class */
+                left: -280px; /* Default hidden */
+            }
+            .sidebar.active {
+                transform: translateX(280px);
+                left: -280px;
+            }
+            /* When hidden-layout is active on mobile, just ensure it's closed */
+            .sidebar.hidden-layout {
+                transform: translateX(0);
+            }
+
+            .sidebar-overlay {
+                position: fixed;
+                top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.4);
+                backdrop-filter: blur(4px);
+                z-index: 1001;
+                opacity: 0; visibility: hidden;
+                transition: 0.3s;
+            }
+            .sidebar-overlay.active { opacity: 1; visibility: visible; }
         }
 
         .category-card {
@@ -237,7 +331,280 @@
         }
 
         /* --- Content --- */
-        .content { flex: 1; }
+        .content { flex: 1; transition: all 0.3s ease; }
+
+        /* Pages */
+        .page-section { display: none; animation: fadeIn 0.4s ease; }
+        .page-section.active { display: block; }
+        
+        .empty-page {
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        .empty-page i {
+            font-size: 60px;
+            color: #ddd;
+        }
+        .empty-page h2 {
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        /* --- NEW ELEGANT AUTH FORM STYLES (No Tabs, Luxurious) --- */
+        .auth-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            position: relative;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 40px;
+            box-shadow: 0 30px 70px rgba(255, 15, 57, 0.15);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            padding: 50px 40px;
+            transition: all 0.4s ease;
+        }
+
+        /* Close Button inside Card */
+        .auth-close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            color: #999;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .auth-close-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: rotate(90deg) scale(1.1);
+            border-color: var(--primary-color);
+        }
+
+        .auth-header-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .auth-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: -webkit-linear-gradient(45deg, #2d3436, #ff0f39);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-subtitle {
+            font-size: 15px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        /* Elegant Floating Inputs */
+        .elegant-input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .elegant-input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #f0f0f0;
+            border-radius: 18px;
+            font-size: 15px;
+            font-family: 'Prompt', sans-serif;
+            color: var(--text-main);
+            outline: none;
+            background: #fff;
+            transition: all 0.3s;
+        }
+
+        .elegant-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(255, 15, 57, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .elegant-input-group i.icon-lead {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            transition: 0.3s;
+            font-size: 18px;
+        }
+
+        .elegant-input:focus + i.icon-lead {
+            color: var(--primary-color);
+        }
+
+        /* Label float effect could be added here, but simple placeholder is requested often. 
+           Keeping it clean with icons. */
+
+        .elegant-input-group i.eye-toggle {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .elegant-input-group i.eye-toggle:hover { color: var(--primary-color); }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .form-actions label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .form-actions input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            width: 16px; height: 16px;
+        }
+
+        .forgot-pass {
+            color: #888;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .forgot-pass:hover { color: var(--primary-color); }
+
+        .elegant-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 25px rgba(255, 15, 57, 0.25);
+            font-family: 'Prompt', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .elegant-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(255, 15, 57, 0.4);
+        }
+
+        .auth-switch-text {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .auth-switch-text a {
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 5px;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .auth-switch-text a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
+        }
+        
+        .auth-switch-text a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
+        }
+
+        /* Transitions for switching forms */
+        .auth-form-container {
+            transition: all 0.4s ease-in-out;
+        }
+        
+        .hidden-form {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        
+        .visible-form {
+            display: block;
+            animation: slideFadeIn 0.5s ease forwards;
+        }
+
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Password Strength (Minimal) */
+        .strength-dots {
+            display: flex;
+            gap: 4px;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+        .strength-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #eee;
+            transition: 0.3s;
+        }
+
+        /* --- END NEW AUTH --- */
 
         /* Banner (1300x300) */
         .banner-container {
@@ -506,6 +873,81 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(255, 15, 57, 0.4);
         }
+
+        /* --- Bottom Navigation Bar --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--nav-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.4);
+            z-index: 2000;
+            width: auto;
+            min-width: 320px;
+            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smooth hiding */
+        }
+
+        /* Class to hide navbar */
+        .bottom-nav.nav-hidden {
+            transform: translate(-50%, 200%); /* Move down out of sight */
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            text-decoration: none;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 3px;
+            display: none; 
+        }
+        
+        /* Active State */
+        .nav-item.active {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 15, 57, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .nav-item:hover:not(.active) {
+            color: var(--primary-color);
+            background: rgba(255, 15, 57, 0.05);
+        }
+
+        .nav-center {
+            width: 55px;
+            height: 55px;
+        }
+        .nav-center i { font-size: 22px; }
+
 
         /* --- Product Modal (Popup) --- */
         .modal-overlay {
@@ -811,7 +1253,7 @@
             animation: bounce 1s infinite;
         }
 
-        /* Payment QR Modal - Custom Scoped Styles to match your Tailwind design without loading Tailwind full lib */
+        /* Payment QR Modal - Custom Scoped Styles */
         .pm-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -1048,12 +1490,10 @@
         /* Responsive */
         @media (max-width: 992px) {
             .container { flex-direction: column; }
-            .sidebar { width: 100%; overflow-x: auto; position: relative; top: 0; margin-bottom: 20px; }
-            .category-list { display: flex; gap: 10px; }
-            .category-item { flex-shrink: 0; width: auto; margin-bottom: 0; background: white; }
-            .category-card { padding: 10px; background: transparent; box-shadow: none; border: none; }
-            .sidebar-title { display: none; }
+            /* Sidebar handled by drawer logic above */
+            .sidebar-title { display: block; margin-top: 10px;}
             .banner-container { height: 250px; }
+            .bottom-nav { width: 90%; }
         }
 
         /* Mobile specific adjustments (2 columns) */
@@ -1101,19 +1541,27 @@
 
     <!-- Header -->
     <header>
-        <a href="#" class="logo">
-            <div class="logo-icon"><i class="fas fa-crown"></i></div>
-            <div style="display: flex; flex-direction: column; gap: 0; margin-left: 10px;">
-                <h1>C SHOP</h1>
-                <span style="font-size: 10px; color: #888; letter-spacing: 1px; font-weight: 600;">PREMIUM APP</span>
-            </div>
-        </a>
+        <div class="header-left">
+            <!-- 1. Hamburger Menu Icon -->
+            <button class="menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <a href="#" class="logo">
+                <div class="logo-icon"><i class="fas fa-crown"></i></div>
+                <div style="display: flex; flex-direction: column; gap: 0; margin-left: 10px;">
+                    <h1>C SHOP</h1>
+                    <span style="font-size: 10px; color: #888; letter-spacing: 1px; font-weight: 600;">PREMIUM APP & GAME TOP UO</span>
+                </div>
+            </a>
+        </div>
+
         <div class="header-actions">
             <button class="icon-btn" id="cart-btn" onclick="toggleCart()">
                 <i class="fas fa-shopping-bag"></i>
                 <div class="cart-badge" id="cart-badge">0</div>
             </button>
-            <button class="icon-btn">
+            <button class="icon-btn" onclick="switchPage('account')">
                 <i class="fas fa-user"></i>
             </button>
         </div>
@@ -1121,7 +1569,8 @@
 
     <div class="container">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <aside class="sidebar" id="main-sidebar">
             <div class="category-card">
                 <h3 class="sidebar-title">หมวดหมู่สินค้า</h3>
                 <ul class="category-list" id="category-list">
@@ -1133,60 +1582,210 @@
         <!-- Main Content -->
         <main class="content">
             
-            <!-- Banner Slider -->
-            <div class="banner-container">
-                <div class="banner-wrapper" id="banner-wrapper">
-                    <div class="banner-slide">
-                        <div class="banner-overlay"></div>
-                        <img src="https://placehold.co/1300x300/e60023/ffffff?text=ACCPRO+PROMOTION" alt="Promo 1" style="display: none;">
-                        <div style="width:100%; height:100%; background: linear-gradient(45deg, #ff0f39, #ff4757, #ff9a9e); position: absolute; top:0; left:0;"></div>
-                        <div class="banner-content">
-                            <h2>โปรโมชั่นสุดคุ้ม! <br>ลดสูงสุด 50%</h2>
-                            <p>เฉพาะเดือนนี้เท่านั้น เหมาจ่ายรายปีถูกกว่า ประหยัดกว่า</p>
-                            <button style="margin-top: 20px; padding: 12px 30px; background: white; color: #ff0f39; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">ดูรายละเอียด</button>
+            <!-- Page: Home (ID: home-page) - Shows Banner, Search, Grid -->
+            <div id="home-page" class="page-section active">
+                <!-- Banner Slider -->
+                <div class="banner-container" id="main-banner">
+                    <div class="banner-wrapper" id="banner-wrapper">
+                        <div class="banner-slide">
+                            <div class="banner-overlay"></div>
+                            <img src="https://placehold.co/1300x300/e60023/ffffff?text=ACCPRO+PROMOTION" alt="Promo 1" style="display: none;">
+                            <div style="width:100%; height:100%; background: linear-gradient(45deg, #ff0f39, #ff4757, #ff9a9e); position: absolute; top:0; left:0;"></div>
+                            <div class="banner-content">
+                                <h2>โปรโมชั่นสุดคุ้ม! <br>ลดสูงสุด 50%</h2>
+                                <p>เฉพาะเดือนนี้เท่านั้น เหมาจ่ายรายปีถูกกว่า ประหยัดกว่า</p>
+                                <button style="margin-top: 20px; padding: 12px 30px; background: white; color: #ff0f39; border: none; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.1);">ดูรายละเอียด</button>
+                            </div>
+                        </div>
+                        <div class="banner-slide">
+                            <div class="banner-overlay"></div>
+                            <div style="width:100%; height:100%; background: linear-gradient(45deg, #2d3436, #636e72); position: absolute; top:0; left:0;"></div>
+                            <div class="banner-content">
+                                <h2>Netflix 4K UHD <br>ดูได้ทุกที่ ไม่มีสะดุด</h2>
+                                <p>แพ็กเกจจอส่วนตัว ส่วนตัวสุดๆ ไม่มีใครรบกวน</p>
+                            </div>
+                        </div>
+                        <div class="banner-slide">
+                            <div class="banner-overlay"></div>
+                            <div style="width:100%; height:100%; background: linear-gradient(45deg, #00b894, #00cec9); position: absolute; top:0; left:0;"></div>
+                            <div class="banner-content">
+                                <h2>Spotify Premium <br>ฟังเพลงเพราะ ไม่มีโฆษณา</h2>
+                                <p>คุณภาพเสียงระดับสูง โหลดฟังออฟไลน์ได้</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="banner-slide">
-                        <div class="banner-overlay"></div>
-                        <div style="width:100%; height:100%; background: linear-gradient(45deg, #2d3436, #636e72); position: absolute; top:0; left:0;"></div>
-                        <div class="banner-content">
-                            <h2>Netflix 4K UHD <br>ดูได้ทุกที่ ไม่มีสะดุด</h2>
-                            <p>แพ็กเกจจอส่วนตัว ส่วนตัวสุดๆ ไม่มีใครรบกวน</p>
-                        </div>
-                    </div>
-                    <div class="banner-slide">
-                        <div class="banner-overlay"></div>
-                        <div style="width:100%; height:100%; background: linear-gradient(45deg, #00b894, #00cec9); position: absolute; top:0; left:0;"></div>
-                        <div class="banner-content">
-                            <h2>Spotify Premium <br>ฟังเพลงเพราะ ไม่มีโฆษณา</h2>
-                            <p>คุณภาพเสียงระดับสูง โหลดฟังออฟไลน์ได้</p>
-                        </div>
+                    <div class="slider-dots" id="slider-dots">
+                        <div class="dot active" onclick="goToSlide(0)"></div>
+                        <div class="dot" onclick="goToSlide(1)"></div>
+                        <div class="dot" onclick="goToSlide(2)"></div>
                     </div>
                 </div>
-                <div class="slider-dots" id="slider-dots">
-                    <div class="dot active" onclick="goToSlide(0)"></div>
-                    <div class="dot" onclick="goToSlide(1)"></div>
-                    <div class="dot" onclick="goToSlide(2)"></div>
+
+                <!-- Shared Content: Search & Grid -->
+                <!-- Note: We use the same ID containers but will toggle visibility of the banner above -->
+            </div>
+
+            <!-- Placeholder Pages -->
+            <div id="topup-page" class="page-section">
+                <div class="empty-page">
+                    <i class="fas fa-wallet"></i>
+                    <h2>เติมเงิน</h2>
+                    <p>ระบบเติมเงินจะเปิดให้บริการเร็วๆ นี้</p>
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="search-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" class="search-input" id="search-input" placeholder="ค้นหาแอปพลิเคชันที่คุณต้องการ...">
+            <div id="history-page" class="page-section">
+                <div class="empty-page">
+                    <i class="fas fa-history"></i>
+                    <h2>ประวัติการสั่งซื้อ</h2>
+                    <p>คุณยังไม่มีประวัติการสั่งซื้อ</p>
+                </div>
             </div>
 
-            <div class="section-header">
-                <i class="fas fa-fire-alt"></i>
-                <h2>สินค้าแนะนำยอดฮิต</h2>
+            <!-- Account Page with Beautiful Auth Form (Luxurious Design) -->
+            <div id="account-page" class="page-section">
+                <div class="auth-wrapper">
+                    <div class="auth-card">
+                        <!-- Close Button -->
+                        <button class="auth-close-btn" onclick="switchPage('home')">
+                            <i class="fas fa-times"></i>
+                        </button>
+
+                        <!-- LOGIN SECTION -->
+                        <div id="login-form" class="auth-form-container visible-form">
+                            <div class="auth-header-text">
+                                <h2 class="auth-title">ยินดีต้อนรับ</h2>
+                                <p class="auth-subtitle">เข้าสู่ระบบเพื่อใช้งานพรีเมียมฟีเจอร์</p>
+                            </div>
+                            
+                            <form onsubmit="event.preventDefault(); alert('เข้าสู่ระบบสำเร็จ! (Demo)');">
+                                <div class="elegant-input-group">
+                                    <input type="text" class="elegant-input" placeholder="อีเมล / เบอร์โทรศัพท์" required>
+                                    <i class="fas fa-user icon-lead"></i>
+                                </div>
+
+                                <div class="elegant-input-group">
+                                    <input type="password" id="loginPassword" class="elegant-input" placeholder="รหัสผ่าน" required>
+                                    <i class="fas fa-lock icon-lead"></i>
+                                    <i class="fas fa-eye eye-toggle" onclick="toggleSinglePassword('loginPassword', this)"></i>
+                                </div>
+
+                                <div class="form-actions">
+                                    <label>
+                                        <input type="checkbox"> จำรหัสผ่าน
+                                    </label>
+                                    <a href="#" class="forgot-pass">ลืมรหัสผ่าน?</a>
+                                </div>
+
+                                <button type="submit" class="elegant-btn">
+                                    เข้าสู่ระบบ <i class="fas fa-arrow-right"></i>
+                                </button>
+
+                                <div class="auth-switch-text">
+                                    ยังไม่มีบัญชี? <a onclick="switchAuthMode('register')">ลงทะเบียน</a>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- REGISTER SECTION -->
+                        <div id="register-form" class="auth-form-container hidden-form">
+                            <div class="auth-header-text">
+                                <h2 class="auth-title">สร้างบัญชี</h2>
+                                <p class="auth-subtitle">สมัครสมาชิกเพื่อเริ่มต้นใช้งาน</p>
+                            </div>
+                            
+                            <form onsubmit="event.preventDefault(); alert('สมัครสมาชิกสำเร็จ! (Demo)');">
+                                <div class="elegant-input-group">
+                                    <input type="text" class="elegant-input" placeholder="ชื่อ - นามสกุล" required>
+                                    <i class="fas fa-user icon-lead"></i>
+                                </div>
+
+                                <div class="elegant-input-group">
+                                    <input type="tel" class="elegant-input" placeholder="เบอร์โทรศัพท์" required>
+                                    <i class="fas fa-phone icon-lead"></i>
+                                </div>
+
+                                <div class="elegant-input-group">
+                                    <input type="password" id="regPassword" class="elegant-input" placeholder="รหัสผ่าน" required>
+                                    <i class="fas fa-lock icon-lead"></i>
+                                </div>
+                                <div class="strength-dots">
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
+                                </div>
+
+                                <div class="elegant-input-group">
+                                    <input type="password" id="regConfirmPassword" class="elegant-input" placeholder="ยืนยันรหัสผ่าน" required>
+                                    <i class="fas fa-check-circle icon-lead"></i>
+                                    <i class="fas fa-eye eye-toggle" onclick="toggleRegisterPasswords(this)"></i>
+                                </div>
+
+                                <button type="submit" class="elegant-btn">
+                                    สมัครสมาชิก <i class="fas fa-user-plus"></i>
+                                </button>
+
+                                <div class="auth-switch-text">
+                                    มีบัญชีอยู่แล้ว? <a onclick="switchAuthMode('login')">เข้าสู่ระบบ</a>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
             </div>
 
-            <!-- Product Grid -->
-            <div class="product-grid" id="product-grid">
-                <!-- JS Injected -->
+            <!-- Common Elements (Search & Grid) used in Home and Products page -->
+            <div id="common-content">
+                <!-- Search -->
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="search-input" placeholder="ค้นหาแอปพลิเคชันที่คุณต้องการ...">
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-fire-alt"></i>
+                    <h2 id="grid-title">สินค้าแนะนำยอดฮิต</h2>
+                </div>
+
+                <!-- Product Grid -->
+                <div class="product-grid" id="product-grid">
+                    <!-- JS Injected -->
+                </div>
             </div>
+
         </main>
     </div>
+
+    <!-- 2. Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <!-- 1. เติมเงิน -->
+        <div class="nav-item" id="nav-topup" onclick="switchPage('topup')">
+            <i class="fas fa-wallet"></i>
+        </div>
+        
+        <!-- 2. สินค้า -->
+        <div class="nav-item" id="nav-products" onclick="switchPage('products')">
+            <i class="fas fa-box-open"></i>
+        </div>
+
+        <!-- 3. หน้าหลัก (Center) -->
+        <div class="nav-item nav-center active" id="nav-home" onclick="switchPage('home')">
+            <i class="fas fa-home"></i>
+        </div>
+
+        <!-- 4. ประวัติ -->
+        <div class="nav-item" id="nav-history" onclick="switchPage('history')">
+            <i class="fas fa-clock"></i>
+        </div>
+
+        <!-- 5. บัญชี -->
+        <div class="nav-item" id="nav-account" onclick="switchPage('account')">
+            <i class="fas fa-user"></i>
+        </div>
+    </nav>
+
 
     <!-- Product Details Modal (Popup) -->
     <div class="modal-overlay" id="product-modal-overlay">
@@ -1367,8 +1966,168 @@
         let currentCategory = 'all';
         let cart = [];
         let currentTotal = 0; // เก็บยอดรวมปัจจุบัน
+        let isUIOverlayOpen = false; // Flag for overlays (Cart/Payment)
 
-        // --- Payment Logic (NEW) ---
+        // --- Page Navigation Logic (UPDATED) ---
+        function switchPage(pageId) {
+            // 1. Update Bottom Nav Active State
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav-' + pageId).classList.add('active');
+
+            // 2. Hide all page sections first
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            
+            // 3. Elements Control
+            const banner = document.getElementById('main-banner');
+            const commonContent = document.getElementById('common-content');
+            const sidebar = document.getElementById('main-sidebar');
+            
+            // ** RESET SIDEBAR VISIBILITY FIRST **
+            sidebar.classList.remove('hidden-layout');
+
+            // 4. Show content based on page
+            if (pageId === 'home') {
+                document.getElementById('home-page').classList.add('active');
+                banner.style.display = 'block';
+                commonContent.style.display = 'block';
+                document.getElementById('grid-title').innerText = "สินค้าแนะนำยอดฮิต";
+            } else if (pageId === 'products') {
+                document.getElementById('home-page').classList.add('active'); 
+                banner.style.display = 'none'; 
+                commonContent.style.display = 'block';
+                document.getElementById('grid-title').innerText = "รายการสินค้าทั้งหมด";
+            } else if (pageId === 'account') {
+                // ** HIDE SIDEBAR FOR ACCOUNT PAGE **
+                sidebar.classList.add('hidden-layout');
+                
+                document.getElementById('account-page').classList.add('active');
+                commonContent.style.display = 'none';
+            } else {
+                document.getElementById(pageId + '-page').classList.add('active');
+                commonContent.style.display = 'none';
+            }
+
+            // Scroll to top
+            window.scrollTo(0,0);
+        }
+
+        // --- Scroll Logic for Bottom Nav (NEW) ---
+        let lastScrollTop = 0;
+        const bottomNav = document.querySelector('.bottom-nav');
+
+        window.addEventListener('scroll', function() {
+            // If overlays are open, keep nav hidden and ignore scroll
+            if(isUIOverlayOpen) return;
+
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > lastScrollTop && scrollTop > 50) {
+                // Scrolling Down
+                bottomNav.classList.add('nav-hidden');
+            } else {
+                // Scrolling Up
+                bottomNav.classList.remove('nav-hidden');
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; // For Mobile or negative scrolling
+        }, false);
+
+        // --- Sidebar Logic (New) ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // --- Form Switching Logic (ANIMATED) ---
+        function switchAuthMode(target) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+
+            if (target === 'register') {
+                // Hide Login, Show Register
+                loginForm.classList.remove('visible-form');
+                loginForm.classList.add('hidden-form');
+                
+                setTimeout(() => {
+                    registerForm.classList.remove('hidden-form');
+                    registerForm.classList.add('visible-form');
+                }, 300); // Slight delay for smooth transition
+            } else {
+                // Hide Register, Show Login
+                registerForm.classList.remove('visible-form');
+                registerForm.classList.add('hidden-form');
+                
+                setTimeout(() => {
+                    loginForm.classList.remove('hidden-form');
+                    loginForm.classList.add('visible-form');
+                }, 300);
+            }
+        }
+
+        // --- Password Toggle for LOGIN (Single field) ---
+        function toggleSinglePassword(inputId, icon) {
+            const input = document.getElementById(inputId);
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // --- Password Toggle for REGISTER (Both fields controlled by one eye) ---
+        function toggleRegisterPasswords(icon) {
+            const pass1 = document.getElementById('regPassword');
+            const pass2 = document.getElementById('regConfirmPassword');
+            
+            // Check state based on the confirm password field
+            if (pass2.type === "password") {
+                // Show both
+                pass1.type = "text";
+                pass2.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                // Hide both
+                pass1.type = "password";
+                pass2.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // --- Password Strength Meter Logic (DOTS) ---
+        const passwordInput = document.getElementById('regPassword');
+        const strengthDots = document.querySelectorAll('.strength-dot');
+
+        passwordInput.addEventListener('input', function() {
+            const val = passwordInput.value;
+            let strength = 0;
+
+            if (val.length > 0) {
+                if (val.length >= 6) strength++;
+                if (val.match(/([0-9])/)) strength++;
+                if (val.match(/([a-z])/) && val.match(/([A-Z])/)) strength++;
+                if (val.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength++;
+            }
+
+            // Update Dots
+            strengthDots.forEach((dot, index) => {
+                if (index < strength) {
+                    if(strength <= 2) dot.style.background = '#ff4757'; // Red
+                    else if(strength === 3) dot.style.background = '#ffa502'; // Orange
+                    else dot.style.background = '#2ed573'; // Green
+                } else {
+                    dot.style.background = '#eee';
+                }
+            });
+        });
+
+        // --- Payment Logic ---
         let qrcodeObj = null;
         let timerInterval;
 
@@ -1424,6 +2183,9 @@
         }
 
         function openPaymentModal() {
+            isUIOverlayOpen = true; // Lock Scroll Hiding Logic
+            document.querySelector('.bottom-nav').classList.add('nav-hidden'); // Force Hide Nav
+            
             document.getElementById('payment-modal').classList.add('active');
             initQR();
             
@@ -1445,6 +2207,13 @@
         function closePaymentModal() {
             document.getElementById('payment-modal').classList.remove('active');
             clearInterval(timerInterval);
+            
+            // Only unhide nav if cart is also closed
+            const isCartOpen = document.getElementById('cart-sidebar').classList.contains('open');
+            if(!isCartOpen) {
+                isUIOverlayOpen = false;
+                document.querySelector('.bottom-nav').classList.remove('nav-hidden');
+            }
         }
 
         function generateQR(amount) {
@@ -1503,6 +2272,10 @@
             updateCart();
             document.getElementById('cart-sidebar').classList.remove('open');
             document.getElementById('cart-overlay').classList.remove('open');
+            
+            // Ensure nav comes back after everything closes
+            isUIOverlayOpen = false;
+            document.querySelector('.bottom-nav').classList.remove('nav-hidden');
         }
 
         // --- Existing Shopping Cart Logic ---
@@ -1561,6 +2334,10 @@
             currentCategory = id;
             renderCategories(); 
             renderProducts(document.getElementById('search-input').value); 
+            // On mobile, auto close sidebar when category selected
+            if(window.innerWidth <= 992) {
+                toggleSidebar();
+            }
         }
 
         document.getElementById('search-input').addEventListener('input', (e) => {
@@ -1667,8 +2444,21 @@
         }
 
         function toggleCart() {
-            document.getElementById('cart-sidebar').classList.toggle('open');
-            document.getElementById('cart-overlay').classList.toggle('open');
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const bottomNav = document.querySelector('.bottom-nav');
+
+            cartSidebar.classList.toggle('open');
+            cartOverlay.classList.toggle('open');
+
+            // Manage Nav Visibility based on Cart State
+            if (cartSidebar.classList.contains('open')) {
+                isUIOverlayOpen = true; // Set flag
+                bottomNav.classList.add('nav-hidden');
+            } else {
+                isUIOverlayOpen = false; // Reset flag
+                bottomNav.classList.remove('nav-hidden');
+            }
         }
 
         function toggleDetails() {

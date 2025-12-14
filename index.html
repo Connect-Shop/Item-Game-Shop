@@ -6,7 +6,7 @@
     <title>C SHOP CONNECT</title>
     
     <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- QR Libraries -->
@@ -62,10 +62,9 @@
             60% {transform: translateY(-5px);}
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            80% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
+        @keyframes spin-once {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* --- Header --- */
@@ -82,12 +81,6 @@
             z-index: 1000;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             border-bottom: var(--glass-border);
-            transition: transform 0.3s ease;
-        }
-
-        /* Hidden Header Class */
-        header.hidden-layout {
-            transform: translateY(-100%);
         }
 
         .header-left {
@@ -165,6 +158,70 @@
             gap: 10px;
             align-items: center;
         }
+
+        /* --- Wallet Widget (New) --- */
+        .wallet-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            margin-right: 5px;
+            height: 40px;
+            transition: all 0.3s;
+        }
+
+        .wallet-pill:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 15px rgba(255, 15, 57, 0.1);
+        }
+
+        .wallet-icon-box {
+            width: 24px;
+            height: 24px;
+            background: #fff0f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 12px;
+        }
+
+        .wallet-amount {
+            font-family: 'Prompt', sans-serif;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 2px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+
+        .refresh-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .refresh-btn.spinning i {
+            animation: spin-once 0.5s ease-in-out;
+        }
+
+        /* --- End Wallet Widget --- */
 
         .icon-btn {
             width: 38px;
@@ -244,7 +301,7 @@
             transform: translateX(-20px);
         }
 
-        /* Mobile Sidebar Drawer */
+        /* Mobile Sidebar Drawer (Screens < 992px) */
         @media (max-width: 992px) {
             .sidebar {
                 position: fixed;
@@ -257,14 +314,15 @@
                 padding: 20px;
                 box-shadow: 5px 0 20px rgba(0,0,0,0.1);
                 overflow-y: auto;
-                opacity: 1; 
-                transform: translateX(0); 
-                left: -280px; 
+                opacity: 1; /* Reset for mobile drawer */
+                transform: translateX(0); /* Reset logic handled by active class */
+                left: -280px; /* Default hidden */
             }
             .sidebar.active {
                 transform: translateX(280px);
                 left: -280px;
             }
+            /* When hidden-layout is active on mobile, just ensure it's closed */
             .sidebar.hidden-layout {
                 transform: translateX(0);
             }
@@ -279,6 +337,28 @@
                 transition: 0.3s;
             }
             .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        }
+
+        /* DESKTOP Specific Adjustments (Screens > 992px) */
+        @media (min-width: 993px) {
+            .menu-toggle {
+                display: none !important; /* Hide hamburger on desktop */
+            }
+            .sidebar {
+                display: block !important;
+                transform: none !important; /* Force show */
+                position: sticky; /* Keep it sticky */
+            }
+            /* Adjust container to row if it was changed */
+            .container {
+                flex-direction: row;
+            }
+            
+            /* Enhance wallet on desktop */
+            .wallet-pill {
+                padding: 6px 18px;
+                margin-right: 15px;
+            }
         }
 
         .category-card {
@@ -368,124 +448,7 @@
             color: var(--text-main);
         }
 
-        /* --- TOPUP & GAME STYLES --- */
-        .topup-container, .game-container {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-soft);
-        }
-        
-        .topup-header h2, .game-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
-        .topup-header p, .game-header p { color: #888; font-size: 14px; margin-bottom: 25px; }
-
-        .amount-input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        .amount-input-group span {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        .amount-input {
-            width: 100%;
-            padding: 20px;
-            font-size: 24px;
-            font-weight: 800;
-            border: 2px solid #eee;
-            border-radius: 16px;
-            outline: none;
-            color: var(--text-main);
-            font-family: 'Prompt', sans-serif;
-        }
-        .amount-input:focus { border-color: var(--primary-color); }
-
-        .amount-grid, .game-list-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .game-list-grid {
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Wider for game cards */
-        }
-
-        .amount-btn, .game-card-select {
-            background: #fff;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            padding: 15px 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            position: relative;
-            overflow: hidden;
-        }
-        .amount-btn:hover, .game-card-select:hover {
-            border-color: var(--primary-color);
-            background: #fff0f3;
-            transform: translateY(-3px);
-        }
-        .amount-btn.active, .game-card-select.active {
-            background: var(--primary-gradient);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 8px 20px rgba(255, 15, 57, 0.3);
-        }
-        .amount-btn i { font-size: 18px; margin-bottom: 2px; }
-        .amount-btn span, .game-card-select span { font-weight: 700; font-family: 'Prompt', sans-serif; text-align: center; }
-        
-        /* Game Specific */
-        .game-card-select img {
-            width: 80px; height: 80px; border-radius: 18px; margin-bottom: 10px; object-fit: cover;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        /* Game Detail */
-        .game-detail-view { display: none; }
-        .game-detail-view.active { display: block; animation: fadeIn 0.3s; }
-        
-        .game-back-btn {
-            display: flex; align-items: center; gap: 10px; cursor: pointer; color: #666; margin-bottom: 20px; font-weight: 600;
-        }
-        .game-back-btn:hover { color: var(--primary-color); }
-
-        .package-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; margin-top: 20px;
-        }
-        .package-card {
-            border: 1px solid #eee; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s;
-        }
-        .package-card:hover { border-color: var(--primary-color); background: #fff0f3; }
-        .package-card.selected {
-            border-color: var(--primary-color);
-            background: #fff0f3;
-            box-shadow: 0 0 0 2px var(--primary-color);
-        }
-        .package-icon img {
-            width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px;
-        }
-        .package-price { color: var(--primary-color); font-weight: 700; font-size: 16px; margin-top: 5px; }
-
-        .game-pay-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: none; /* Hidden by default */
-            animation: fadeIn 0.3s ease;
-        }
-        .game-pay-section.active { display: block; }
-
-        /* --- AUTH FORM STYLES --- */
+        /* --- NEW ELEGANT AUTH FORM STYLES (No Tabs, Luxurious) --- */
         .auth-wrapper {
             display: flex;
             justify-content: center;
@@ -535,7 +498,11 @@
             border-color: var(--primary-color);
         }
 
-        .auth-header-text { text-align: center; margin-bottom: 40px; }
+        .auth-header-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
         .auth-title {
             font-size: 32px;
             font-weight: 800;
@@ -545,9 +512,19 @@
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
         }
-        .auth-subtitle { font-size: 15px; color: #888; font-weight: 400; }
 
-        .elegant-input-group { position: relative; margin-bottom: 25px; }
+        .auth-subtitle {
+            font-size: 15px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        /* Elegant Floating Inputs */
+        .elegant-input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
         .elegant-input {
             width: 100%;
             padding: 15px 15px 15px 45px;
@@ -560,418 +537,1109 @@
             background: #fff;
             transition: all 0.3s;
         }
+
         .elegant-input:focus {
             border-color: var(--primary-color);
             box-shadow: 0 10px 30px rgba(255, 15, 57, 0.08);
             transform: translateY(-2px);
         }
+
         .elegant-input-group i.icon-lead {
-            position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
-            color: #ccc; transition: 0.3s; font-size: 18px;
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            transition: 0.3s;
+            font-size: 18px;
         }
-        .elegant-input:focus + i.icon-lead { color: var(--primary-color); }
+
+        .elegant-input:focus + i.icon-lead {
+            color: var(--primary-color);
+        }
+
+        /* Label float effect could be added here, but simple placeholder is requested often. 
+           Keeping it clean with icons. */
+
         .elegant-input-group i.eye-toggle {
-            position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
-            color: #ccc; cursor: pointer; transition: 0.3s;
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.3s;
         }
         .elegant-input-group i.eye-toggle:hover { color: var(--primary-color); }
 
         .form-actions {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; font-size: 13px; color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 13px;
+            color: #666;
         }
-        .form-actions label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        .form-actions input[type="checkbox"] { accent-color: var(--primary-color); width: 16px; height: 16px; }
-        .forgot-pass { color: #888; text-decoration: none; transition: 0.2s; }
+
+        .form-actions label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .form-actions input[type="checkbox"] {
+            accent-color: var(--primary-color);
+            width: 16px; height: 16px;
+        }
+
+        .forgot-pass {
+            color: #888;
+            text-decoration: none;
+            transition: 0.2s;
+        }
         .forgot-pass:hover { color: var(--primary-color); }
 
         .elegant-btn {
-            width: 100%; padding: 16px;
+            width: 100%;
+            padding: 16px;
             background: var(--primary-gradient);
-            color: white; border: none; border-radius: 18px;
-            font-size: 16px; font-weight: 700; cursor: pointer;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
             transition: all 0.3s;
             box-shadow: 0 10px 25px rgba(255, 15, 57, 0.25);
             font-family: 'Prompt', sans-serif;
-            display: flex; justify-content: center; align-items: center; gap: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
             margin-bottom: 25px;
         }
-        .elegant-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 35px rgba(255, 15, 57, 0.4); }
 
-        .auth-switch-text { text-align: center; font-size: 14px; color: #888; }
+        .elegant-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(255, 15, 57, 0.4);
+        }
+
+        .auth-switch-text {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+
         .auth-switch-text a {
-            color: var(--primary-color); font-weight: 700; text-decoration: none;
-            margin-left: 5px; position: relative; cursor: pointer;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-decoration: none;
+            margin-left: 5px;
+            position: relative;
+            cursor: pointer;
         }
+        
         .auth-switch-text a::after {
-            content: ''; position: absolute; width: 100%; height: 2px;
-            bottom: -2px; left: 0; background-color: var(--primary-color);
-            transform: scaleX(0); transform-origin: bottom right; transition: transform 0.3s ease-out;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: bottom right;
+            transition: transform 0.3s ease-out;
         }
-        .auth-switch-text a:hover::after { transform: scaleX(1); transform-origin: bottom left; }
-
-        .auth-form-container { transition: all 0.4s ease-in-out; }
-        .hidden-form { display: none; opacity: 0; transform: translateX(20px); }
-        .visible-form { display: block; animation: slideFadeIn 0.5s ease forwards; }
-        @keyframes slideFadeIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-
-        /* Reverted Password Strength (Bar Style) */
-        .strength-indicator {
-            height: 4px; background: #eee; border-radius: 4px;
-            margin-top: -15px; margin-bottom: 8px; overflow: hidden;
+        
+        .auth-switch-text a:hover::after {
+            transform: scaleX(1);
+            transform-origin: bottom left;
         }
-        .strength-fill { height: 100%; width: 0; transition: width 0.3s, background-color 0.3s; }
-        .strength-label { font-size: 11px; text-align: right; color: #aaa; margin-bottom: 20px; }
 
-        /* --- END AUTH --- */
+        /* Transitions for switching forms */
+        .auth-form-container {
+            transition: all 0.4s ease-in-out;
+        }
+        
+        .hidden-form {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        
+        .visible-form {
+            display: block;
+            animation: slideFadeIn 0.5s ease forwards;
+        }
 
-        /* Banner */
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Password Strength (Minimal) */
+        .strength-dots {
+            display: flex;
+            gap: 4px;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+        .strength-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #eee;
+            transition: 0.3s;
+        }
+
+        /* --- END NEW AUTH --- */
+
+        /* Banner (1300x300) */
         .banner-container {
-            width: 100%; height: 300px; border-radius: var(--radius-xl);
-            overflow: hidden; position: relative; margin-bottom: 40px;
-            box-shadow: var(--shadow-hover); background: #000;
+            width: 100%;
+            height: 300px;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-hover);
+            background: #000;
         }
-        .banner-wrapper { display: flex; width: 100%; height: 100%; transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1); }
-        .banner-slide { min-width: 100%; height: 100%; position: relative; }
-        .banner-slide img { width: 100%; height: 100%; object-fit: cover; }
+
+        .banner-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .banner-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .banner-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .banner-content {
-            position: absolute; bottom: 40px; left: 40px; z-index: 2;
-            color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.3); max-width: 500px;
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            z-index: 2;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            max-width: 500px;
         }
+
         .banner-content h2 {
-            font-size: 36px; font-weight: 800; margin-bottom: 10px;
-            opacity: 0; transform: translateY(20px); animation: fadeIn 0.8s forwards 0.3s;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards 0.3s;
         }
+
         .banner-content p {
-            font-size: 16px; opacity: 0; transform: translateY(20px); animation: fadeIn 0.8s forwards 0.5s;
+            font-size: 16px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards 0.5s;
         }
-        .slider-dots { position: absolute; bottom: 20px; right: 40px; display: flex; gap: 10px; z-index: 10; }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
         .dot {
-            width: 12px; height: 12px; background: rgba(255,255,255,0.4);
-            border-radius: 50%; cursor: pointer; transition: all 0.3s;
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        .dot.active { background: white; width: 30px; border-radius: 10px; }
 
-        /* Search */
+        .dot.active {
+            background: white;
+            width: 30px;
+            border-radius: 10px;
+        }
+
+        /* --- Search Bar Fixed --- */
         .search-wrapper {
-            background: white; padding: 10px; border-radius: var(--radius-md);
-            display: flex; align-items: center; box-shadow: var(--shadow-soft);
-            margin-bottom: 30px; border: 1px solid #eee; transition: all 0.3s;
+            background: white;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+            transition: all 0.3s;
         }
-        .search-wrapper:focus-within {
-            box-shadow: var(--shadow-hover); border-color: #eee; transform: translateY(-2px);
-        }
-        .search-wrapper i { margin: 0 15px; color: #ccc; font-size: 18px; }
-        .search-input { flex: 1; border: none; font-size: 16px; color: var(--text-main); padding: 8px 0; outline: none; }
 
-        /* Product Grid */
-        .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; }
+        .search-wrapper:focus-within {
+            box-shadow: var(--shadow-hover);
+            border-color: #eee; 
+            transform: translateY(-2px);
+        }
+
+        .search-wrapper i {
+            margin: 0 15px;
+            color: #ccc;
+            font-size: 18px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            font-size: 16px;
+            color: var(--text-main);
+            padding: 8px 0;
+            outline: none; 
+        }
+
+        /* --- Product Grid --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
         .section-header h2 { font-size: 24px; font-weight: 800; }
         .section-header i { color: var(--primary-color); font-size: 24px; }
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; padding-bottom: 50px; }
-        
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 25px;
+            padding-bottom: 50px;
+        }
+
         .product-card {
-            background: white; border-radius: var(--radius-md); padding: 20px;
-            position: relative; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            display: flex; flex-direction: column; border: 1px solid #f0f0f0;
-            overflow: hidden; cursor: pointer; 
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #f0f0f0;
+            overflow: hidden;
+            cursor: pointer; 
         }
-        .product-card:hover { transform: translateY(-10px) scale(1.02); box-shadow: var(--shadow-hover); border-color: transparent; z-index: 2; }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+            border-color: transparent;
+            z-index: 2;
+        }
+
         .product-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 6px;
-            background: var(--primary-gradient); opacity: 0; transition: opacity 0.3s;
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 6px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
+
         .product-card:hover::before { opacity: 1; }
-        .card-top { display: flex; gap: 15px; margin-bottom: 10px; }
+
+        .card-top {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px; 
+        }
+
         .card-icon {
-            width: 60px; height: 60px; border-radius: 14px; display: flex;
-            justify-content: center; align-items: center; transition: all 0.3s;
-            flex-shrink: 0; overflow: hidden; background-color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-        .card-icon img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
-        .product-card:hover .card-icon img { transform: scale(1.1); }
-        .card-info { flex: 1; }
+
+        .card-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover .card-icon img {
+            transform: scale(1.1);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
         .card-info h3 {
-            font-size: 16px; font-weight: 700; line-height: 1.4; margin-bottom: 5px;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
+
         .tag {
-            font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px;
-            border-radius: 6px; background: #f1f2f6; color: #636e72; display: inline-block; margin-bottom: 5px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: #f1f2f6;
+            color: #636e72;
+            display: inline-block;
+            margin-bottom: 5px;
         }
-        .card-price { margin-top: auto; margin-bottom: 15px; }
-        .price-wrapper { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-        .price-val { font-size: 20px; font-weight: 800; color: var(--primary-color); }
+
+        .card-price {
+            margin-top: auto;
+            margin-bottom: 15px;
+        }
+
+        .price-wrapper {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap; 
+        }
+
+        .price-val {
+            font-size: 20px; 
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
         .price-unit { font-size: 12px; color: #aaa; font-weight: 500; }
         .price-old { font-size: 12px; text-decoration: line-through; color: #ccc; }
+
         .buy-btn {
-            width: 100%; border: none; background: var(--primary-gradient); color: white;
-            padding: 10px; border-radius: 12px; font-size: 14px; font-weight: 700;
-            cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
+            width: 100%;
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 10px; 
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
             box-shadow: 0 5px 15px rgba(255, 15, 57, 0.2);
         }
-        .buy-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 15, 57, 0.4); }
 
-        /* Bottom Nav */
+        .buy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 15, 57, 0.4);
+        }
+
+        /* --- Bottom Navigation Bar --- */
         .bottom-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--nav-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 50px; padding: 10px 15px; display: flex; justify-content: space-between;
-            align-items: center; gap: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-            border: 1px solid rgba(255,255,255,0.4); z-index: 2000; width: auto; min-width: 320px;
-            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--nav-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50px;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.4);
+            z-index: 2000;
+            width: auto;
+            min-width: 320px;
+            transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smooth hiding */
         }
-        .bottom-nav.nav-hidden { transform: translate(-50%, 200%); }
+
+        /* Class to hide navbar */
+        .bottom-nav.nav-hidden {
+            transform: translate(-50%, 200%); /* Move down out of sight */
+        }
+
         .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #999; text-decoration: none; cursor: pointer; width: 45px; height: 45px;
-            border-radius: 50%; transition: all 0.3s ease; position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            text-decoration: none;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .nav-item i { font-size: 18px; transition: transform 0.2s; }
-        .nav-item span { font-size: 10px; font-weight: 600; margin-top: 3px; display: none; }
+
+        .nav-item i {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 3px;
+            display: none; 
+        }
+        
+        /* Active State */
         .nav-item.active {
-            background: var(--primary-gradient); color: white;
-            box-shadow: 0 5px 15px rgba(255, 15, 57, 0.3); transform: translateY(-5px);
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 15, 57, 0.3);
+            transform: translateY(-5px);
         }
-        .nav-item:hover:not(.active) { color: var(--primary-color); background: rgba(255, 15, 57, 0.05); }
-        .nav-center { width: 55px; height: 55px; }
+
+        .nav-item:hover:not(.active) {
+            color: var(--primary-color);
+            background: rgba(255, 15, 57, 0.05);
+        }
+
+        .nav-center {
+            width: 55px;
+            height: 55px;
+        }
         .nav-center i { font-size: 22px; }
 
-        /* Modals & Sidebar */
+
+        /* --- Product Modal (Popup) --- */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 2000;
-            display: flex; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: all 0.3s;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
         }
+
         .modal-overlay.open { opacity: 1; visibility: visible; }
+
         .product-modal {
-            background: white; width: 90%; max-width: 500px; border-radius: var(--radius-xl);
-            padding: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); transform: scale(0.9);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative;
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
         }
+
         .modal-overlay.open .product-modal { transform: scale(1); }
+
         .modal-close {
-            position: absolute; top: 20px; right: 20px; background: #f0f0f0; border: none;
-            width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 18px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #f0f0f0;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
         }
+
         .modal-close:hover { background: #ff4757; color: white; }
-        .modal-header { display: flex; gap: 20px; margin-bottom: 25px; align-items: center; }
-        .modal-icon {
-            width: 80px; height: 80px; border-radius: 20px; display: flex;
-            align-items: center; justify-content: center; overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1); background: white;
+
+        .modal-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: center;
         }
-        .modal-icon img { width: 100%; height: 100%; object-fit: cover; }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: white;
+        }
+        
+        .modal-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .modal-title h2 { font-size: 24px; font-weight: 800; margin-bottom: 5px; }
         .modal-title .tag { font-size: 12px; padding: 4px 10px; }
+
         .modal-body { margin-bottom: 25px; }
-        .modal-price { font-size: 32px; font-weight: 800; color: var(--primary-color); margin-bottom: 15px; }
-        .modal-desc-list { background: #f9f9f9; padding: 15px; border-radius: 12px; }
-        .modal-actions { display: flex; gap: 15px; }
-        .btn-outline {
-            flex: 1; padding: 12px; border: 2px solid #eee; background: white;
-            border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        
+        .modal-price {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 15px;
         }
+        
+        .modal-desc-list {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-outline {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #eee;
+            background: white;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
         .btn-outline:hover { border-color: #333; }
 
+        /* --- Cart Sidebar --- */
         .cart-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 1001;
-            opacity: 0; visibility: hidden; transition: all 0.3s;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
         }
+
         .cart-sidebar {
-            position: fixed; top: 0; right: -400px; width: 380px; height: 100%;
-            background: white; z-index: 1002; transition: cubic-bezier(0.4, 0.0, 0.2, 1) 0.4s;
-            display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0; right: -400px;
+            width: 380px; height: 100%;
+            background: white;
+            z-index: 1002;
+            transition: cubic-bezier(0.4, 0.0, 0.2, 1) 0.4s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.1);
         }
+
         .cart-sidebar.open { right: 0; }
         .cart-overlay.open { opacity: 1; visibility: visible; }
+
         .cart-header {
-            padding: 25px; font-size: 20px; font-weight: 800; border-bottom: 1px solid #f0f0f0;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px;
+            font-size: 20px;
+            font-weight: 800;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
+
         .cart-items { flex: 1; overflow-y: auto; padding: 20px; }
-        .cart-footer { padding: 25px; background: #f9f9f9; border-top: 1px solid #eee; }
+        
+        .cart-footer {
+            padding: 25px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+
+        /* Cart Items Styles */
         .cart-promo {
-            position: relative; background: white; border-radius: 50px; padding: 5px;
-            display: flex; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: all 0.3s;
-            margin-bottom: 20px; border: 1px solid transparent;
+            position: relative;
+            background: white;
+            border-radius: 50px;
+            padding: 5px;
+            display: flex;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
         }
-        .cart-promo:focus-within { box-shadow: 0 8px 20px rgba(255, 15, 57, 0.15); border-color: #ff0f39; }
-        .cart-promo input { flex: 1; padding: 10px 20px; border: none; background: transparent; outline: none; font-size: 14px; color: #333; }
+
+        .cart-promo:focus-within {
+            box-shadow: 0 8px 20px rgba(255, 15, 57, 0.15);
+            border-color: #ff0f39;
+        }
+
+        .cart-promo input {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            color: #333;
+        }
+
         .cart-promo button {
-            background: var(--primary-gradient); color: white; border: none; padding: 8px 25px;
-            border-radius: 40px; cursor: pointer; font-weight: 700; font-size: 13px;
-            box-shadow: 0 4px 10px rgba(255, 15, 57, 0.3); transition: transform 0.2s;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 8px 25px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(255, 15, 57, 0.3);
+            transition: transform 0.2s;
         }
-        .cart-promo button:hover { transform: scale(1.05); }
+
+        .cart-promo button:hover {
+            transform: scale(1.05);
+        }
+
         .summary-details-toggle {
-            display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; color: #666; font-size: 14px; margin-bottom: 15px;
-            padding: 10px 0; border-bottom: 1px dashed #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
         }
+
         .summary-details-toggle i { transition: transform 0.3s; }
         .summary-details-toggle.active i { transform: rotate(180deg); }
-        .summary-details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; font-size: 13px; color: #888; }
-        .summary-details.open { max-height: 100px; }
-        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+
+        .summary-details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .summary-details.open {
+            max-height: 100px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
         .total-row {
-            display: flex; justify-content: space-between; align-items: center; font-weight: 800;
-            font-size: 18px; margin-bottom: 20px; color: #2d3436;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 800;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #2d3436;
         }
-        .total-price-text { color: var(--primary-color); font-size: 22px; }
+        
+        .total-price-text {
+            color: var(--primary-color);
+            font-size: 22px;
+        }
+        
         .cart-item-row {
-            display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee;
-            padding-bottom: 10px; animation: fadeIn 0.3s ease; gap: 15px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+            gap: 15px;
         }
-        .cart-item-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; flex-shrink: 0; border: 1px solid #eee; }
 
+        .cart-item-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #eee;
+        }
+
+        /* --- Payment & Loading Overlays (NEW) --- */
+
+        /* Loading Overlay */
         .loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9);
-            z-index: 3000; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.9);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
         }
-        .loading-overlay.active { opacity: 1; visibility: visible; }
-        .spinner-main {
-            width: 50px; height: 50px; border: 4px solid #fed7aa; border-top: 4px solid #ff4757;
-            border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 15px;
-        }
-        .loading-text { font-size: 18px; font-weight: 700; color: var(--text-main); animation: bounce 1s infinite; }
 
+        .loading-overlay.active { opacity: 1; visibility: visible; }
+
+        .spinner-main {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #fed7aa;
+            border-top: 4px solid #ff4757;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            animation: bounce 1s infinite;
+        }
+
+        /* Payment QR Modal - Custom Scoped Styles */
         .pm-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px); z-index: 3001; display: none; align-items: center;
-            justify-content: center; padding: 20px;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 3001;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
+
         .pm-overlay.active { display: flex; animation: fadeIn 0.3s ease-out; }
+
         .pm-card {
-            background-color: white; border-radius: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            width: 100%; max-width: 340px; padding: 1.5rem; text-align: center;
-            border: 1px solid #f3f4f6; position: relative; overflow: hidden;
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 340px;
+            padding: 1.5rem; 
+            text-align: center;
+            border: 1px solid #f3f4f6;
+            position: relative;
+            overflow: hidden;
         }
+
         .pm-close-btn {
-            position: absolute; top: 10px; right: 10px; width: 30px; height: 30px;
-            border-radius: 50%; background: #f3f4f6; color: #888; border: none;
-            cursor: pointer; font-size: 16px; display: flex; align-items: center;
-            justify-content: center; z-index: 20;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #888;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
         }
         .pm-close-btn:hover { background: #ff4757; color: white; }
+
         .pm-top-logo-box {
-            border: 1px solid #1e3a8a; padding: 6px 16px; display: inline-flex;
-            align-items: center; justify-content: center; margin-bottom: 20px;
-            background: white; white-space: nowrap; min-height: 32px; box-sizing: border-box;
+            border: 1px solid #1e3a8a;
+            padding: 6px 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: white;
+            white-space: nowrap;
+            min-height: 32px;
+            box-sizing: border-box;
         }
+        
         .pm-top-logo-text {
-            color: #1e3a8a; font-weight: 700; font-family: 'Prompt', sans-serif;
-            font-size: 15px; letter-spacing: 0.5px; line-height: 1; display: block;
+            color: #1e3a8a;
+            font-weight: 700;
+            font-family: 'Prompt', sans-serif;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            display: block;
         }
+
         .pm-qr-container {
-            position: relative; width: 140px; height: 140px; margin: 0 auto 15px auto;
-            background: white; display: flex; align-items: center; justify-content: center;
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 15px auto;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
         .pm-qr-overlay-logo {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 30px; height: 30px; background: white; padding: 2px;
-            border-radius: 5px; box-shadow: 0 0 4px rgba(0,0,0,0.15); z-index: 5; object-fit: cover;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px; height: 30px;
+            background: white;
+            padding: 2px;
+            border-radius: 5px;
+            box-shadow: 0 0 4px rgba(0,0,0,0.15);
+            z-index: 5;
+            object-fit: cover;
         }
+
+        /* NEW TIMER & STATUS STYLES */
         .pm-timer-large {
-            font-family: 'Prompt', sans-serif; font-size: 28px; font-weight: 700;
-            color: #f97316; margin-bottom: 5px; line-height: 1;
+            font-family: 'Prompt', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #f97316; /* Orange color */
+            margin-bottom: 5px;
+            line-height: 1;
         }
+
         .pm-status-text {
-            color: #9ca3af; font-size: 13px; font-weight: 400;
-            font-family: 'Prompt', sans-serif; margin-bottom: 16px; line-height: 1.4;
+            color: #9ca3af;
+            font-size: 13px;
+            font-weight: 400;
+            font-family: 'Prompt', sans-serif;
+            margin-bottom: 16px;
+            line-height: 1.4;
         }
-        .pm-divider { border-top: 1px solid #f3f4f6; margin: 15px 0; width: 100%; }
+
+        .pm-divider {
+            border-top: 1px solid #f3f4f6;
+            margin: 15px 0;
+            width: 100%;
+        }
+
         .pm-detail-row {
-            display: flex; justify-content: space-between; align-items: baseline;
-            margin-bottom: 8px; font-family: 'Prompt', sans-serif;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+            font-family: 'Prompt', sans-serif;
         }
+        
         .pm-label { color: #9ca3af; font-size: 13px; }
         .pm-value { color: #1e3a8a; font-weight: 500; font-size: 13px; }
+
         .pm-amount-box {
-            background-color: #eef5ff; border-radius: 0.75rem; padding: 0.5rem 1rem;
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; border: 1px solid #eff6ff; font-family: 'Prompt', sans-serif;
+            background-color: #eef5ff;
+            border-radius: 0.75rem; /* rounded-xl */
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid #eff6ff;
+            font-family: 'Prompt', sans-serif;
         }
+
         .pm-amount-input {
-            background: transparent; text-align: right; width: 120px; outline: none;
-            font-weight: 600; color: #1e3a8a; font-size: 16px; border: none; font-family: 'Prompt', sans-serif;
+            background: transparent;
+            text-align: right;
+            width: 120px;
+            outline: none;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 16px;
+            border: none;
+            font-family: 'Prompt', sans-serif;
         }
+
+        /* NEW UPLOAD & CONFIRM STYLES */
         .slip-upload-wrapper {
-            position: relative; background: white; border-radius: 50px; padding: 5px;
-            display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            border: 1px solid #eee; margin-bottom: 15px; font-family: 'Prompt', sans-serif;
+            position: relative;
+            background: white;
+            border-radius: 50px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+            margin-bottom: 15px;
+            font-family: 'Prompt', sans-serif;
         }
+
         .slip-file-text {
-            flex: 1; padding: 0 15px; font-size: 13px; color: #888; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; text-align: left;
+            flex: 1;
+            padding: 0 15px;
+            font-size: 13px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
         }
+
         .slip-upload-btn {
-            background: #1e3a8a; color: white; border: none; padding: 8px 20px;
-            border-radius: 40px; cursor: pointer; font-weight: 600; font-size: 13px;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2); transition: transform 0.2s;
-            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+            background: #1e3a8a; /* Dark Blue */
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.2);
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
         }
-        .slip-upload-btn:hover { transform: scale(1.05); background: #172554; }
+        
+        .slip-upload-btn:hover {
+            transform: scale(1.05);
+            background: #172554;
+        }
+
         .btn-confirm-payment {
-            width: 100%; padding: 14px; background: var(--primary-gradient); color: white;
-            border: none; border-radius: 12px; font-family: 'Prompt', sans-serif;
-            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Prompt', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
             box-shadow: 0 5px 15px rgba(255, 15, 57, 0.3);
         }
-        .btn-confirm-payment:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(255, 15, 57, 0.5); }
+
+        .btn-confirm-payment:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 15, 57, 0.5);
+        }
+
+        /* Spinner for loading inside QR */
         .spinner {
-            width: 35px; height: 35px; border: 3px solid #fed7aa; border-top: 3px solid #f97316;
-            border-radius: 50%; animation: spin 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
+            width: 35px; height: 35px;
+            border: 3px solid #fed7aa;
+            border-top: 3px solid #f97316;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.55, 0.055, 0.675, 0.19) infinite;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-        /* --- Receipt Popup Styles --- */
-        .receipt-card {
-            background: white; width: 100%; max-width: 380px; border-radius: 12px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; position: relative;
-            transform-style: preserve-3d; animation: cardFloat 3s ease-in-out infinite alternate;
+        /* Responsive */
+        @media (max-width: 992px) {
+            .container { flex-direction: column; }
+            /* Sidebar handled by drawer logic above */
+            .sidebar-title { display: block; margin-top: 10px;}
+            .banner-container { height: 250px; }
+            .bottom-nav { width: 90%; }
+            /* Hide wallet text on small mobile if needed */
+            .wallet-pill { margin-right: 0; }
         }
-        @keyframes cardFloat {
-            0% { transform: translateY(0) rotateX(0); } 100% { transform: translateY(-10px) rotateX(2deg); }
-        }
-        .logo-area { text-align: center; padding: 25px 0; }
-        .c-shop-logo {
-            font-family: 'Sarabun', sans-serif; font-weight: 800; font-size: 2.5rem; line-height: 1; letter-spacing: -1px;
-            background: linear-gradient(135deg, #003366 0%, #0056b3 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            display: inline-block; position: relative;
-        }
-        .c-shop-sub { font-size: 0.7rem; color: #003366; letter-spacing: 1px; margin-top: 5px; font-weight: 500; }
-        .divider { height: 1px; background-color: #e0e0e0; margin: 0 20px; }
-        .status-success { color: #28a745; font-weight: 600; }
-        .info-box { background-color: #f4f6f8; padding: 20px; margin-top: 10px; }
-        .shimmer { position: relative; overflow: hidden; }
-        .shimmer::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
-            transform: skewX(-25deg); animation: shimmerMove 3s infinite;
-        }
-        @keyframes shimmerMove { 100% { left: 200%; } }
-        .copy-btn { cursor: pointer; transition: all 0.2s; }
-        .copy-btn:active { transform: scale(0.95); }
-        .confetti {
-            position: absolute; width: 10px; height: 10px; background-color: #f00;
-            animation: fall linear forwards; z-index: -1;
-        }
-        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
 
+        /* Mobile specific adjustments (2 columns) */
+        @media (max-width: 576px) {
+            .container { padding: 0 15px; }
+            header { padding: 15px 20px; }
+            
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr); /* 2 Columns on mobile */
+                gap: 15px; /* ลดช่องว่างระหว่างการ์ด */
+            }
+
+            .product-card {
+                padding: 15px; /* ลด padding */
+            }
+
+            .card-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 22px;
+                border-radius: 10px;
+            }
+
+            .card-top {
+                flex-direction: column; /* ไอคอนอยู่บน ชื่ออยู่ล่าง */
+                gap: 10px;
+            }
+
+            .card-info h3 {
+                font-size: 14px;
+            }
+
+            .price-val { font-size: 18px; }
+            .buy-btn { font-size: 12px; }
+            
+            /* Banner */
+            .banner-container { height: 150px; margin-bottom: 20px; }
+            .banner-content { left: 20px; bottom: 20px; }
+            .banner-content h2 { font-size: 18px; margin-bottom: 5px; }
+            .banner-content p { font-size: 12px; display: none; } /* ซ่อนคำอธิบายบนมือถือ */
+            
+            /* Wallet adjustment for small screens */
+            .wallet-amount { font-size: 12px; }
+            .wallet-pill { padding: 4px 10px; height: 34px;}
+        }
     </style>
 </head>
 <body>
 
     <!-- Header -->
-    <header id="main-header">
+    <header>
         <div class="header-left">
-            <!-- 1. Hamburger Menu Icon -->
+            <!-- 1. Hamburger Menu Icon (Hidden on Desktop via CSS) -->
             <button class="menu-toggle" onclick="toggleSidebar()">
                 <i class="fas fa-bars"></i>
             </button>
@@ -980,12 +1648,23 @@
                 <div class="logo-icon"><i class="fas fa-crown"></i></div>
                 <div style="display: flex; flex-direction: column; gap: 0; margin-left: 10px;">
                     <h1>C SHOP</h1>
-                    <span style="font-size: 10px; color: #888; letter-spacing: 1px; font-weight: 600;">PREMIUM APP</span>
+                    <span style="font-size: 10px; color: #888; letter-spacing: 1px; font-weight: 600;">PREMIUM APP & GAME TOP UP</span>
                 </div>
             </a>
         </div>
 
         <div class="header-actions">
+            <!-- New Wallet Widget -->
+            <div class="wallet-pill">
+                <div class="wallet-icon-box">
+                    <i class="fas fa-wallet"></i>
+                </div>
+                <span class="wallet-amount" id="wallet-balance">0.00 THB</span>
+                <button class="refresh-btn" id="refresh-wallet-btn" onclick="refreshWallet()">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+
             <button class="icon-btn" id="cart-btn" onclick="toggleCart()">
                 <i class="fas fa-shopping-bag"></i>
                 <div class="cart-badge" id="cart-badge">0</div>
@@ -1054,45 +1733,12 @@
                 <!-- Note: We use the same ID containers but will toggle visibility of the banner above -->
             </div>
 
-            <!-- Page: Topup -->
+            <!-- Placeholder Pages -->
             <div id="topup-page" class="page-section">
-                <div class="topup-container">
-                    <div class="topup-header">
-                        <h2>เติมเงินเข้าระบบ</h2>
-                        <p>เลือกจำนวนเงินหรือระบุยอดที่ต้องการ</p>
-                    </div>
-
-                    <div class="amount-input-group">
-                        <input type="number" id="custom-amount" class="amount-input" placeholder="ระบุจำนวนเงิน" oninput="clearAmountSelection()">
-                        <span>THB</span>
-                    </div>
-
-                    <div class="amount-grid">
-                        <div class="amount-btn" onclick="selectTopupAmount(100, this)">
-                            <i class="fas fa-coins text-yellow-500"></i>
-                            <span>100</span>
-                        </div>
-                        <div class="amount-btn" onclick="selectTopupAmount(300, this)">
-                            <i class="fas fa-money-bill-wave text-green-500"></i>
-                            <span>300</span>
-                        </div>
-                        <div class="amount-btn" onclick="selectTopupAmount(500, this)">
-                            <i class="fas fa-money-bill-wave text-blue-500"></i>
-                            <span>500</span>
-                        </div>
-                        <div class="amount-btn" onclick="selectTopupAmount(1000, this)">
-                            <i class="fas fa-gem text-purple-500"></i>
-                            <span>1,000</span>
-                        </div>
-                        <div class="amount-btn" onclick="selectTopupAmount(2000, this)">
-                            <i class="fas fa-crown text-yellow-600"></i>
-                            <span>2,000</span>
-                        </div>
-                    </div>
-
-                    <button class="elegant-btn" onclick="initiateTopupPayment()">
-                        ยืนยันการเติมเงิน <i class="fas fa-arrow-right"></i>
-                    </button>
+                <div class="empty-page">
+                    <i class="fas fa-wallet"></i>
+                    <h2>เติมเงิน</h2>
+                    <p>ระบบเติมเงินจะเปิดให้บริการเร็วๆ นี้</p>
                 </div>
             </div>
 
@@ -1171,11 +1817,12 @@
                                     <input type="password" id="regPassword" class="elegant-input" placeholder="รหัสผ่าน" required>
                                     <i class="fas fa-lock icon-lead"></i>
                                 </div>
-                                <!-- Password Strength Bar (Reverted) -->
-                                <div class="strength-indicator">
-                                    <div id="strength-bar" class="strength-fill"></div>
+                                <div class="strength-dots">
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
+                                    <div class="strength-dot"></div>
                                 </div>
-                                <div id="strength-text" class="strength-label">ความปลอดภัย: ...</div>
 
                                 <div class="elegant-input-group">
                                     <input type="password" id="regConfirmPassword" class="elegant-input" placeholder="ยืนยันรหัสผ่าน" required>
@@ -1210,43 +1857,9 @@
                     <h2 id="grid-title">สินค้าแนะนำยอดฮิต</h2>
                 </div>
 
-                <!-- Product Grid (Will be reused for Games) -->
+                <!-- Product Grid -->
                 <div class="product-grid" id="product-grid">
                     <!-- JS Injected -->
-                </div>
-            </div>
-
-            <!-- Hidden Game Detail View Container (moved here to share content area logic) -->
-            <div id="game-detail-container" style="display: none;">
-                 <!-- Game Detail View -->
-                 <div id="game-detail-view" class="game-container game-detail-view">
-                    <div class="game-back-btn" onclick="closeGameDetail()">
-                        <i class="fas fa-arrow-left"></i> กลับไปหน้ารวมเกม
-                    </div>
-                    <div class="game-header">
-                        <h2 id="selected-game-name">Game Name</h2>
-                        <p>กรอกข้อมูลและเลือกแพ็กเกจ</p>
-                    </div>
-
-                    <div class="elegant-input-group">
-                        <input type="text" id="player-id-input" class="elegant-input" placeholder="Player ID" required>
-                        <i class="fas fa-id-card icon-lead"></i>
-                    </div>
-
-                    <div class="package-grid" id="package-grid">
-                        <!-- JS Injected -->
-                    </div>
-
-                    <!-- Payment Section (Hidden until package selected) -->
-                    <div id="game-pay-section" class="game-pay-section">
-                        <div class="flex justify-between items-center mb-4">
-                            <span class="text-gray-600">ยอดชำระสุทธิ</span>
-                            <span class="text-xl font-bold text-[#ff0f39]" id="game-pay-amount">0.00 THB</span>
-                        </div>
-                        <button class="elegant-btn" onclick="confirmGamePayment()">
-                            ชำระเงิน <i class="fas fa-credit-card"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -1260,7 +1873,7 @@
             <i class="fas fa-wallet"></i>
         </div>
         
-        <!-- 2. สินค้า (Categories) -->
+        <!-- 2. สินค้า -->
         <div class="nav-item" id="nav-products" onclick="switchPage('products')">
             <i class="fas fa-box-open"></i>
         </div>
@@ -1305,20 +1918,6 @@
                     <i class="fas fa-cart-plus"></i> เพิ่มลงตะกร้า
                 </button>
             </div>
-        </div>
-    </div>
-
-    <!-- Warning Modal (New) -->
-    <div class="modal-overlay" id="warning-modal">
-        <div class="product-modal" style="text-align: center; max-width: 350px;">
-            <div style="display: flex; justify-content: center; margin-bottom: 20px;">
-                <div style="width: 80px; height: 80px; background: #fff0f3; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: #ff4757; animation: bounce 1s infinite;"></i>
-                </div>
-            </div>
-            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 10px;">แจ้งเตือน</h3>
-            <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">กรุณาแนบหลักฐานการโอนเงิน (สลิป)<br>ก่อนยืนยันการชำระเงินทุกครั้ง</p>
-            <button class="buy-btn" onclick="closeWarningModal()">ตกลง</button>
         </div>
     </div>
 
@@ -1435,75 +2034,6 @@
         </div>
     </div>
 
-    <!-- Receipt Modal (New) -->
-    <div class="modal-overlay" id="receipt-modal">
-        <div class="receipt-card shimmer" id="receipt">
-            <button class="modal-close" style="z-index: 20;" onclick="closeReceipt()">&times;</button>
-            
-            <!-- Header / Logo -->
-            <div class="logo-area">
-                <div class="relative inline-block">
-                    <!-- Logo Style mimicking NDID but for C SHOP -->
-                    <div class="flex items-center justify-center gap-1" style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-                        <span style="font-size: 2.5rem; font-weight: 800; color: #003366;">C</span>
-                        <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                            <span style="font-size: 1.5rem; font-weight: 800; color: #D4AF37;">SHOP</span>
-                        </div>
-                        <i class="fas fa-check-circle" style="color: #dc2626; font-size: 1.25rem; margin-bottom: 20px;"></i>
-                    </div>
-                    <div class="c-shop-sub" style="text-align: center;">Connect Center Service</div>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <!-- Main Content -->
-            <div style="padding: 24px; padding-bottom: 8px;">
-                <!-- Status Row -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
-                    <div>
-                        <h2 style="font-size: 1rem; font-weight: 700; color: #1f2937;">ชำระเงินผ่าน C SHOP QR Pay</h2>
-                    </div>
-                    <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #28a745; padding: 4px 8px; border-radius: 4px; font-size: 0.875rem; font-weight: 600;">
-                        อนุมัติ
-                    </div>
-                </div>
-
-                <!-- Provider Row -->
-                <div style="margin-bottom: 24px;">
-                    <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 4px;">ประเภทการชำระเงิน</p>
-                    <p style="font-size: 1rem; font-weight: 700; color: #111827;" id="receipt-type">BY PRODUCT NETFLIX</p>
-                </div>
-
-                <!-- Date Row -->
-                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
-                    <div>
-                        <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 4px;">วันที่ทำรายการ</p>
-                        <p style="font-size: 1rem; font-weight: 500; color: #1f2937;" id="current-date">--</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 4px;">ทำรายการ</p>
-                        <p style="font-size: 1rem; font-weight: 500; color: #1f2937;">ชำระเงิน</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Info Box -->
-            <div class="info-box" style="font-size: 0.875rem;">
-                <p style="color: #3b5998; font-weight: 700; margin-bottom: 8px;">หมายเหตุ !</p>
-                <p style="color: #4b5563; line-height: 1.625; margin-bottom: 16px;">
-                    กรุณาตรวจสอบรายการและยอดเงินทุกครั้งก่อนกดยืนยันการทำธุรกรรม เพื่อความถูกต้อง
-                </p>
-
-                <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; cursor: pointer;" onclick="copyRef()">
-                    <span style="color: #6b7280; font-size: 0.75rem;">(รหัสอ้างอิง : <span style="color: black; font-family: monospace; font-weight: 700;" id="ref-code">88294012</span>)</span>
-                    <i class="far fa-copy" style="color: #9ca3af;"></i>
-                </div>
-                <div id="copy-msg" style="color: #16a34a; font-size: 0.75rem; margin-top: 4px; height: 16px; opacity: 0; transition: opacity 0.3s; text-align: center;">คัดลอกเรียบร้อย!</div>
-            </div>
-        </div>
-    </div>
-
     <!-- JS Logic -->
     <script type="module">
         import promptpayQr from 'https://fastly.jsdelivr.net/npm/promptpay-qr@0.5.0/+esm';
@@ -1523,7 +2053,6 @@
         // --- Data ---
         const categories = [
             { id: 'all', name: 'ทั้งหมด', count: 50 },
-            { id: 'games', name: 'Game Online', count: 6 },
             { id: 'entertainment', name: 'Entertainment', count: 25 },
             { id: 'music', name: 'Music Streaming', count: 10 },
             { id: 'work', name: 'Work & Tools', count: 8 },
@@ -1541,54 +2070,29 @@
             { id: 8, name: "ChatGPT Plus", type: "work", price: 290, old: 750, stock: 3, icon: "https://placehold.co/100x100/74aa9c/ffffff?text=AI", desc: ["GPT-4 Model", "ตอบเร็วมาก", "สร้างรูปภาพได้"], tag: "AI" }
         ];
 
-        // --- Game Data ---
-        const gamesData = [
-            { id: 'rov', name: 'RoV: Mobile MOBA', icon: 'https://placehold.co/100x100/1e3a8a/ffffff?text=RoV', inputLabel: 'OpenID' },
-            { id: 'ff', name: 'Free Fire', icon: 'https://placehold.co/100x100/f59e0b/ffffff?text=FF', inputLabel: 'Player ID' },
-            { id: 'pubg', name: 'PUBG Mobile', icon: 'https://placehold.co/100x100/fcd34d/000000?text=PUBG', inputLabel: 'Character ID' },
-            { id: 'genshin', name: 'Genshin Impact', icon: 'https://placehold.co/100x100/ec4899/ffffff?text=Genshin', inputLabel: 'UID' },
-            { id: 'codm', name: 'Call of Duty', icon: 'https://placehold.co/100x100/374151/ffffff?text=CODM', inputLabel: 'OpenID' },
-            { id: 'val', name: 'Valorant', icon: 'https://placehold.co/100x100/ef4444/ffffff?text=VAL', inputLabel: 'Riot ID' }
-        ];
-
-        const gamePackages = {
-            'rov': [
-                { price: 35, name: '36 Coupons' },
-                { price: 100, name: '110 Coupons' },
-                { price: 300, name: '350 Coupons' },
-                { price: 500, name: '600 Coupons' }
-            ],
-            'ff': [
-                { price: 35, name: '100 Diamonds' },
-                { price: 179, name: '520 Diamonds' },
-                { price: 349, name: '1060 Diamonds' }
-            ],
-            // Default for others
-            'default': [
-                { price: 50, name: 'Starter Pack' },
-                { price: 150, name: 'Pro Pack' },
-                { price: 500, name: 'Ultra Pack' }
-            ]
-        };
-
         // --- State ---
         let currentCategory = 'all';
         let cart = [];
         let currentTotal = 0; // เก็บยอดรวมปัจจุบัน
         let isUIOverlayOpen = false; // Flag for overlays (Cart/Payment)
-        let isTopupMode = false; // Flag for topup
-        let currentReceiptTitle = "ชำระค่าสินค้า"; // Title for receipt
-        
-        // Game State
-        let selectedGamePrice = 0;
-        let selectedGameTitle = "";
+
+        // --- Wallet Logic (NEW) ---
+        function refreshWallet() {
+            const btn = document.getElementById('refresh-wallet-btn');
+            btn.classList.add('spinning');
+            
+            // Simulate refresh delay
+            setTimeout(() => {
+                btn.classList.remove('spinning');
+                // Could fetch real data here
+            }, 800);
+        }
 
         // --- Page Navigation Logic (UPDATED) ---
         function switchPage(pageId) {
             // 1. Update Bottom Nav Active State
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            const navItem = document.getElementById('nav-' + pageId);
-            if(navItem) navItem.classList.add('active');
+            document.getElementById('nav-' + pageId).classList.add('active');
 
             // 2. Hide all page sections first
             document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
@@ -1597,11 +2101,9 @@
             const banner = document.getElementById('main-banner');
             const commonContent = document.getElementById('common-content');
             const sidebar = document.getElementById('main-sidebar');
-            const header = document.getElementById('main-header');
             
-            // ** RESET SIDEBAR & HEADER VISIBILITY FIRST **
+            // ** RESET SIDEBAR VISIBILITY FIRST **
             sidebar.classList.remove('hidden-layout');
-            header.classList.remove('hidden-layout');
 
             // 4. Show content based on page
             if (pageId === 'home') {
@@ -1609,17 +2111,14 @@
                 banner.style.display = 'block';
                 commonContent.style.display = 'block';
                 document.getElementById('grid-title').innerText = "สินค้าแนะนำยอดฮิต";
-                selectCat(null, 'all'); // Reset Category
             } else if (pageId === 'products') {
                 document.getElementById('home-page').classList.add('active'); 
                 banner.style.display = 'none'; 
                 commonContent.style.display = 'block';
-                selectCat(null, 'all'); // Reset
                 document.getElementById('grid-title').innerText = "รายการสินค้าทั้งหมด";
             } else if (pageId === 'account') {
-                // ** HIDE SIDEBAR & HEADER FOR ACCOUNT PAGE **
+                // ** HIDE SIDEBAR FOR ACCOUNT PAGE **
                 sidebar.classList.add('hidden-layout');
-                header.classList.add('hidden-layout');
                 
                 document.getElementById('account-page').classList.add('active');
                 commonContent.style.display = 'none';
@@ -1665,15 +2164,19 @@
             const registerForm = document.getElementById('register-form');
 
             if (target === 'register') {
+                // Hide Login, Show Register
                 loginForm.classList.remove('visible-form');
                 loginForm.classList.add('hidden-form');
+                
                 setTimeout(() => {
                     registerForm.classList.remove('hidden-form');
                     registerForm.classList.add('visible-form');
-                }, 300);
+                }, 300); // Slight delay for smooth transition
             } else {
+                // Hide Register, Show Login
                 registerForm.classList.remove('visible-form');
                 registerForm.classList.add('hidden-form');
+                
                 setTimeout(() => {
                     loginForm.classList.remove('hidden-form');
                     loginForm.classList.add('visible-form');
@@ -1681,9 +2184,10 @@
             }
         }
 
-        // --- Password Toggle ---
+        // --- Password Toggle for LOGIN (Single field) ---
         function toggleSinglePassword(inputId, icon) {
             const input = document.getElementById(inputId);
+            
             if (input.type === "password") {
                 input.type = "text";
                 icon.classList.remove('fa-eye');
@@ -1695,151 +2199,53 @@
             }
         }
 
+        // --- Password Toggle for REGISTER (Both fields controlled by one eye) ---
         function toggleRegisterPasswords(icon) {
             const pass1 = document.getElementById('regPassword');
             const pass2 = document.getElementById('regConfirmPassword');
+            
+            // Check state based on the confirm password field
             if (pass2.type === "password") {
-                pass1.type = "text"; pass2.type = "text";
-                icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash');
+                // Show both
+                pass1.type = "text";
+                pass2.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
-                pass1.type = "password"; pass2.type = "password";
-                icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye');
+                // Hide both
+                pass1.type = "password";
+                pass2.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 
-        // --- Password Strength Meter Logic (Bar) ---
+        // --- Password Strength Meter Logic (DOTS) ---
         const passwordInput = document.getElementById('regPassword');
-        const strengthBar = document.getElementById('strength-bar');
-        const strengthText = document.getElementById('strength-text');
+        const strengthDots = document.querySelectorAll('.strength-dot');
 
         passwordInput.addEventListener('input', function() {
             const val = passwordInput.value;
             let strength = 0;
-            let status = "";
-            let color = "#eee";
 
             if (val.length > 0) {
-                if (val.length >= 6) strength += 20;
-                if (val.match(/([0-9])/)) strength += 20;
-                if (val.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength += 20;
-                if (val.match(/([a-z])/)) strength += 20;
-                if (val.match(/([A-Z])/)) strength += 20;
+                if (val.length >= 6) strength++;
+                if (val.match(/([0-9])/)) strength++;
+                if (val.match(/([a-z])/) && val.match(/([A-Z])/)) strength++;
+                if (val.match(/([!,%,&,@,#,$,^,*,?,_,~])/)) strength++;
             }
 
-            if (strength <= 20) { color = "#ff4757"; status = "แย่มาก"; }
-            else if (strength <= 40) { color = "#ffa502"; status = "อ่อน"; }
-            else if (strength <= 60) { color = "#eccc68"; status = "ปานกลาง"; }
-            else if (strength <= 80) { color = "#7bed9f"; status = "ดี"; }
-            else { color = "#2ed573"; status = "ดีมาก"; }
-
-            if(val.length === 0) { status = "ไม่มี"; strength = 0; color = "#eee"; }
-
-            strengthBar.style.width = strength + '%';
-            strengthBar.style.backgroundColor = color;
-            strengthText.textContent = `ความปลอดภัย: ${status}`;
-            strengthText.style.color = (strength > 0) ? color : '#aaa';
+            // Update Dots
+            strengthDots.forEach((dot, index) => {
+                if (index < strength) {
+                    if(strength <= 2) dot.style.background = '#ff4757'; // Red
+                    else if(strength === 3) dot.style.background = '#ffa502'; // Orange
+                    else dot.style.background = '#2ed573'; // Green
+                } else {
+                    dot.style.background = '#eee';
+                }
+            });
         });
-
-        // --- Game Logic (Merged into Product Flow) ---
-        
-        function openGameDetail(gameId) {
-            const game = gamesData.find(g => g.id === gameId);
-            const gridView = document.getElementById('product-grid');
-            const detailContainer = document.getElementById('game-detail-container');
-            const detailView = document.getElementById('game-detail-view');
-            
-            document.getElementById('selected-game-name').innerText = game.name;
-            document.getElementById('player-id-input').placeholder = game.inputLabel;
-            
-            // Reset Payment Section
-            document.getElementById('game-pay-section').classList.remove('active');
-            selectedGamePrice = 0;
-            selectedGameTitle = "";
-
-            // Render Packages
-            const packages = gamePackages[gameId] || gamePackages['default'];
-            const pkgGrid = document.getElementById('package-grid');
-            pkgGrid.innerHTML = packages.map((pkg, index) => `
-                <div class="package-card" id="pkg-${index}" onclick="selectGamePackage('${game.name}', '${pkg.name}', ${pkg.price}, ${index})">
-                    <div class="package-icon"><img src="https://placehold.co/100x100/ffcc00/ffffff?text=$" alt="coin"></div>
-                    <div style="font-size:14px;">${pkg.name}</div>
-                    <div class="package-price">${pkg.price} THB</div>
-                </div>
-            `).join('');
-
-            // Hide Main Grid, Show Detail
-            gridView.style.display = 'none';
-            detailContainer.style.display = 'block';
-            detailView.classList.add('active');
-        }
-
-        function closeGameDetail() {
-            const gridView = document.getElementById('product-grid');
-            const detailContainer = document.getElementById('game-detail-container');
-            detailContainer.style.display = 'none';
-            gridView.style.display = 'grid';
-        }
-
-        function selectGamePackage(gameName, pkgName, price, index) {
-            // Remove highlight from all
-            document.querySelectorAll('.package-card').forEach(el => el.classList.remove('selected'));
-            // Highlight selected
-            document.getElementById(`pkg-${index}`).classList.add('selected');
-
-            // Store Data
-            selectedGamePrice = price;
-            selectedGameTitle = `${gameName}: ${pkgName}`;
-
-            // Update UI
-            document.getElementById('game-pay-amount').innerText = price.toFixed(2) + " THB";
-            document.getElementById('game-pay-section').classList.add('active');
-        }
-
-        function confirmGamePayment() {
-            const playerId = document.getElementById('player-id-input').value;
-            if(!playerId) {
-                alert('กรุณากรอก Player ID / UID ก่อนชำระเงิน');
-                return;
-            }
-            
-            isTopupMode = true; // Use simple flow without cart clear logic
-            
-            // Show Loading
-            document.getElementById('loading-overlay').classList.add('active');
-            setTimeout(() => {
-                document.getElementById('loading-overlay').classList.remove('active');
-                openPaymentModal(selectedGamePrice, selectedGameTitle);
-            }, 1000);
-        }
-
-        // --- Topup Logic ---
-        function selectTopupAmount(amount, btn) {
-            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('custom-amount').value = amount;
-        }
-
-        function clearAmountSelection() {
-            document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-        }
-
-        function initiateTopupPayment() {
-            const amount = document.getElementById('custom-amount').value;
-            if (!amount || amount <= 0) {
-                alert('กรุณาระบุจำนวนเงินให้ถูกต้อง');
-                return;
-            }
-            
-            isTopupMode = true;
-            const title = `เติมเงินเข้าระบบ ${parseFloat(amount).toFixed(2)} THB`;
-            
-            // Show Loading
-            document.getElementById('loading-overlay').classList.add('active');
-            setTimeout(() => {
-                document.getElementById('loading-overlay').classList.remove('active');
-                openPaymentModal(parseFloat(amount), title);
-            }, 1500);
-        }
 
         // --- Payment Logic ---
         let qrcodeObj = null;
@@ -1865,10 +2271,14 @@
         function initQR() {
             if(!qrcodeObj) {
                 qrcodeObj = new QRCode(document.getElementById("qr-code"), {
-                    width: 140, height: 140,
-                    colorDark : "#000000", colorLight : "#ffffff",
+                    width: 140,
+                    height: 140,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.M
                 });
+                
+                // Set Account info in Modal
                 document.getElementById('account-name').innerText = window.CONFIG_QR.accountName;
                 document.getElementById('promptpay-id').innerText = formatMaskedID(window.CONFIG_QR.id);
             }
@@ -1879,27 +2289,28 @@
                 alert('กรุณาเลือกสินค้าก่อนชำระเงิน');
                 return;
             }
-            isTopupMode = false;
+
             // 1. Show Loading
             document.getElementById('loading-overlay').classList.add('active');
+            
             // 2. Wait 1.5 Seconds
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.remove('active');
+                
                 // 3. Show QR Modal
-                openPaymentModal(currentTotal, "ชำระค่าสินค้า (ตะกร้า)");
+                openPaymentModal();
             }, 1500);
         }
 
-        function openPaymentModal(amount, title) {
-            isUIOverlayOpen = true; 
-            currentReceiptTitle = title; // Set receipt title
+        function openPaymentModal() {
+            isUIOverlayOpen = true; // Lock Scroll Hiding Logic
             document.querySelector('.bottom-nav').classList.add('nav-hidden'); // Force Hide Nav
             
             document.getElementById('payment-modal').classList.add('active');
             initQR();
             
-            // Set Amount
-            document.getElementById('pm-amount-input').value = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            // Set Amount from Cart (Locked)
+            document.getElementById('pm-amount-input').value = currentTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
             // Reset File Input
             document.getElementById('slip-input').value = '';
@@ -1907,7 +2318,7 @@
             document.getElementById('slip-filename').style.color = '#888';
 
             // Generate QR
-            generateQR(amount);
+            generateQR(currentTotal);
             
             // Start Timer
             startTimer(180); // 3 minutes
@@ -1917,6 +2328,7 @@
             document.getElementById('payment-modal').classList.remove('active');
             clearInterval(timerInterval);
             
+            // Only unhide nav if cart is also closed
             const isCartOpen = document.getElementById('cart-sidebar').classList.contains('open');
             if(!isCartOpen) {
                 isUIOverlayOpen = false;
@@ -1971,57 +2383,19 @@
         function confirmPayment() {
             const fileInput = document.getElementById('slip-input');
             if(fileInput.files.length === 0) {
-                // Changed Alert to Custom Modal
-                document.getElementById('warning-modal').classList.add('open');
+                alert('กรุณาแนบสลีปการโอนเงินก่อนยืนยัน');
                 return;
             }
-            
+            alert('ยืนยันการชำระเงินสำเร็จ! (Demo)');
             closePaymentModal();
+            cart = [];
+            updateCart();
+            document.getElementById('cart-sidebar').classList.remove('open');
+            document.getElementById('cart-overlay').classList.remove('open');
             
-            // Show Receipt Modal
-            showReceipt();
-
-            // Clear Cart if not Topup
-            if (!isTopupMode) {
-                cart = [];
-                updateCart();
-                document.getElementById('cart-sidebar').classList.remove('open');
-                document.getElementById('cart-overlay').classList.remove('open');
-            }
-        }
-
-        function closeWarningModal() {
-            document.getElementById('warning-modal').classList.remove('open');
-        }
-
-        // --- Receipt Logic ---
-        function showReceipt() {
-            document.getElementById('receipt-modal').classList.add('open');
-            document.getElementById('receipt-type').innerText = currentReceiptTitle; // Set Dynamic Title
-            
-            // Generate dynamic receipt data
-            const now = new Date();
-            const thMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-            const dateStr = `${now.getDate()} ${thMonths[now.getMonth()]} ${now.getFullYear() + 543 - 2500}, ${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`;
-            document.getElementById('current-date').textContent = dateStr;
-            document.getElementById('ref-code').textContent = Math.floor(10000000 + Math.random() * 90000000);
-        }
-
-        function closeReceipt() {
-            document.getElementById('receipt-modal').classList.remove('open');
-            
-            // Ensure nav comes back
+            // Ensure nav comes back after everything closes
             isUIOverlayOpen = false;
             document.querySelector('.bottom-nav').classList.remove('nav-hidden');
-        }
-
-        function copyRef() {
-            const code = document.getElementById('ref-code').innerText;
-            navigator.clipboard.writeText(code).then(() => {
-                const msg = document.getElementById('copy-msg');
-                msg.style.opacity = '1';
-                setTimeout(() => msg.style.opacity = '0', 2000);
-            });
         }
 
         // --- Existing Shopping Cart Logic ---
@@ -2039,17 +2413,6 @@
         const renderProducts = (filter = '') => {
             const grid = document.getElementById('product-grid');
             
-            // Special Case: Games
-            if (currentCategory === 'games') {
-                grid.innerHTML = gamesData.map(game => `
-                    <div class="game-card-select" onclick="openGameDetail('${game.id}')">
-                        <img src="${game.icon}" alt="${game.name}">
-                        <span>${game.name}</span>
-                    </div>
-                `).join('');
-                return;
-            }
-
             const filtered = products.filter(p => {
                 const matchCat = currentCategory === 'all' || p.type === currentCategory;
                 const matchName = p.name.toLowerCase().includes(filter.toLowerCase());
@@ -2089,24 +2452,10 @@
 
         function selectCat(el, id) {
             currentCategory = id;
-            
-            // Dynamic Title Logic
-            const catObj = categories.find(c => c.id === id);
-            if (id === 'all') {
-                document.getElementById('grid-title').innerText = 'สินค้าแนะนำยอดฮิต';
-            } else if (id === 'games') {
-                document.getElementById('grid-title').innerText = 'บริการ Game Online';
-            } else {
-                document.getElementById('grid-title').innerText = `บริการ ${catObj.name}`;
-            }
-
-            // Close game detail if open
-            closeGameDetail();
-
             renderCategories(); 
             renderProducts(document.getElementById('search-input').value); 
             // On mobile, auto close sidebar when category selected
-            if(window.innerWidth <= 992 && el) {
+            if(window.innerWidth <= 992) {
                 toggleSidebar();
             }
         }
